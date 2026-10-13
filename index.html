@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ぬか漬け管理アプリ</title>
+    <!-- CSSファイルの読み込み -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- ヘッダー（現在の日時） -->
+        <header class="header">
+            <div id="current-datetime" class="datetime">----年--月--日(-) --:--:--</div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- 1. ホーム画面 -->
+            <div id="home-page" class="page-content">
+                <!-- ぬか床カード -->
+                <section class="card">
+                    <!-- ぬか床のタイトルと経過日数 -->
+                    <div class="nuka-info">
+                        <h1 id="nuka-title" class="nuka-title">ぬかみ</h1>
+                        <span id="nuka-days" class="nuka-days">10日目</span>
+                    </div>
+                    <!-- ぬか床のイラスト（スライド表示エリア） -->
+                    <div class="container-wrapper">
+                        <button id="prev-btn" class="slide-btn">‹</button>
+                        <div class="illustration-box">
+                            <!-- ぬか床容器のSVGイラスト -->
+                            <svg class="nuka-svg" viewBox="0 0 200 150" width="160" height="120">
+                                <!-- 容器本体 -->
+                                <rect x="25" y="45" width="150" height="85" rx="12" fill="#EAE0D5" stroke="#7F5539"
+                                    stroke-width="4" />
+                                <!-- ぬか床の中身 -->
+                                <path
+                                    d="M 30 65 Q 60 58 100 65 T 170 65 L 170 120 Q 170 125 165 125 L 35 125 Q 30 125 30 120 Z"
+                                    fill="#DDB892" />
+                                <!-- 米ぬかのつぶつぶ表現 -->
+                                <circle cx="50" cy="80" r="2" fill="#B08968" />
+                                <circle cx="80" cy="100" r="2.5" fill="#B08968" />
+                                <circle cx="120" cy="85" r="2" fill="#B08968" />
+                                <circle cx="150" cy="95" r="2" fill="#B08968" />
+                                <!-- 容器のふち -->
+                                <rect x="20" y="38" width="160" height="12" rx="4" fill="#B08968" stroke="#7F5539"
+                                    stroke-width="3" />
+                            </svg>
+                        </div>
+                        <button id="next-btn" class="slide-btn">›</button>
+                    </div>
+                    <!-- ページネーション（ドット表示） -->
+                    <div class="dots">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                    </div>
+                </section>
+
+                <!-- 漬けている食材のリストエリア -->
+                <section class="vegetable-section">
+                    <div class="section-header">
+                        <h2 class="section-title">漬けている食材</h2>
+                        <div class="add-btn-group">
+                            <button id="add-normal-btn" class="btn-add normal">＋ 本漬け</button>
+                            <button id="add-sute-btn" class="btn-add sute">＋ 捨て漬け</button>
+                        </div>
+                    </div>
+
+                    <!-- JSによって動的に食材カードが挿入されます -->
+                    <div id="vegetable-list" class="vegetable-list"></div>
+                </section>
+            </div>
+
+            <!-- 2. ぬか漬け履歴画面 -->
+            <div id="history-page" class="page-content hidden">
+                <section class="card">
+                    <h2 class="section-title text-center mb-12">ぬか漬け履歴・メモ</h2>
+                    <p class="section-subtitle text-center mb-16">
+                        取り出した食材の漬け込み時間や味の感想を残せます。
+                    </p>
+                    <div id="veg-history-list" class="history-list">
+                        <!-- JSで取り出し履歴とメモを描画 -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- 3. お手入れ画面 -->
+            <div id="care-page" class="page-content hidden">
+                <!-- 状態＆リマインドカード -->
+                <section class="card care-status-card">
+                    <div class="location-toggle-group">
+                        <span class="location-label">置き場所：</span>
+                        <div class="toggle-buttons">
+                            <button id="loc-room-btn" class="toggle-btn active">🏠 常温</button>
+                            <button id="loc-fridge-btn" class="toggle-btn">🧊 冷蔵庫</button>
+                        </div>
+                    </div>
+                    <div class="remind-box">
+                        <div class="remind-time-title">最後にかき混ぜてから</div>
+                        <div id="last-mix-elapsed" class="remind-elapsed">0時間</div>
+                        <p id="care-guide-msg" class="care-guide-text">常温保存では1日1回、冷蔵庫では2〜3日に1回のかき混ぜが目安です。</p>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2 class="section-title text-center mb-12">ぬか床のお手入れ</h2>
+                    <p class="section-subtitle text-center mb-16">
+                        日々のお手入れでおいしいぬか床を保ちましょう。
+                    </p>
+                    <div class="care-action-list">
+                        <button class="care-btn" id="btn-mix">
+                            <span class="care-icon">🥣</span>
+                            <div class="care-info">
+                                <span class="care-name">かき混ぜる</span>
+                                <span class="care-desc">底から空気を入れ替える（天地返し）</span>
+                            </div>
+                        </button>
+                        <button class="care-btn" id="btn-add-nuka">
+                            <span class="care-icon">🌾</span>
+                            <div class="care-info">
+                                <span class="care-name">足しぬか</span>
+                                <span class="care-desc">ぬかと塩を追加・調整する</span>
+                            </div>
+                        </button>
+                        <button class="care-btn" id="btn-water">
+                            <span class="care-icon">🚰</span>
+                            <div class="care-info">
+                                <span class="care-name">水抜き</span>
+                                <span class="care-desc">水分を取り除いて硬さを調整</span>
+                            </div>
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 4. カレンダー画面 -->
+            <div id="calendar-page" class="page-content hidden">
+                <section class="card">
+                    <h2 class="section-title text-center mb-12">ぬか漬け・お手入れカレンダー</h2>
+
+                    <!-- 月間カレンダーエリア -->
+                    <div class="calendar-header">
+                        <button id="cal-prev" class="cal-nav-btn">‹</button>
+                        <span id="cal-month-title" class="cal-title">2026年 10月</span>
+                        <button id="cal-next" class="cal-nav-btn">›</button>
+                    </div>
+                    <div class="calendar-grid-header">
+                        <span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span>
+                    </div>
+                    <div id="calendar-grid" class="calendar-grid">
+                        <!-- JSで日付とアイコンを自動生成 -->
+                    </div>
+
+                    <!-- 選択した日の履歴詳細エリア -->
+                    <div class="selected-day-history">
+                        <h3 id="selected-date-text" class="selected-date-title">日時の履歴</h3>
+                        <div id="day-history-list" class="history-list">
+                            <!-- JSで選択日の履歴を表示 -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- 下部固定ナビゲーションバー -->
+        <nav class="footer-nav">
+            <button class="nav-item active">
+                <span class="nav-icon">🏡</span>
+                <span class="nav-label">ホーム</span>
+            </button>
+            <button class="nav-item">
+                <span class="nav-icon">🥕</span>
+                <span class="nav-label">ぬか漬け</span>
+            </button>
+            <button class="nav-item">
+                <span class="nav-icon">🧼</span>
+                <span class="nav-label">お手入れ</span>
+            </button>
+            <button class="nav-item">
+                <span class="nav-icon">🗓️</span>
+                <span class="nav-label">カレンダー</span>
+            </button>
+        </nav>
+
+        <!-- ========================================== -->
+        <!-- モーダル（ポップアップ）群 -->
+        <!-- ========================================== -->
+
+        <!-- 食材追加モーダル -->
+        <div id="add-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title" class="modal-title">食材を選ぶ</h3>
+                    <div class="modal-header-btns">
+                        <button id="btn-toggle-add-preset" class="icon-btn-trash" title="新規追加">✏️</button>
+                        <button id="btn-toggle-edit-preset" class="icon-btn-trash" title="編集モード">🗑️</button>
+                    </div>
+                </div>
+
+                <!-- プリセット並びエリア -->
+                <div class="veg-presets" id="veg-presets"></div>
+
+                <!-- プリセット自由追加フォーム（初期状態は hidden を付与して非表示） -->
+                <div id="add-preset-form-box" class="add-preset-form hidden">
+                    <p id="preset-error-msg" class="preset-error-msg hidden"></p>
+                    <!-- 絵文字パレット -->
+                    <div id="emoji-picker" class="emoji-picker hidden">
+                        <!-- 【定番野菜】 -->
+                        <span>🥒</span><!-- きゅうり・ズッキーニ -->
+                        <span>🍆</span><!-- なす -->
+                        <span>🥬</span><!-- 大根・キャベツ・白菜 -->
+                        <span>🫜</span><!-- かぶ -->
+                        <span>🥕</span><!-- にんじん -->
+                        <span>🍠</span><!-- 長芋・さつまいも -->
+                        <span>🫑</span><!-- パプリカ・ピーマン -->
+                        <span>🥑</span><!-- アボカド -->
+                        <span>🍅</span><!-- プチトマト -->
+                        <span>🫛</span><!-- オクラ・枝豆 -->
+                        <span>🌿</span><!-- セロリ・昆布・大葉 -->
+                        <span>🍄</span><!-- 干し椎茸・エリンギ -->
+                        <span>🥦</span><!-- ブロッコリー -->
+                        <span>🌽</span><!-- とうもろこし -->
+                        <span>🧅</span><!-- たまねぎ -->
+                        <span>🧄</span><!-- にんにく -->
+
+                        <!-- 【タンパク質・その他食材】 -->
+                        <span>🥚</span><!-- ゆで卵 -->
+                        <span>🧀</span><!-- チーズ -->
+                        <span>⬜</span><!-- 豆腐 -->
+                        <span>⬛</span><!-- こんにゃく -->
+
+                        <!-- 【風味づけ・乾物・薬味・捨て漬け（くず野菜・皮）】 -->
+                        <span>🌶️</span><!-- 唐辛子（鷹の爪） -->
+                        <span>🫚</span><!-- 生姜 -->
+                        <span>🌺</span><!-- みょうが -->
+                        <span>🪵</span><!-- ごぼう -->
+                        <span>🍊</span><!-- みかんの皮（陳皮） -->
+                        <span>🍎</span><!-- りんごの皮（甘みづけ） -->
+                        <span>🍵</span><!-- お茶っ葉（旨味・渋み調整） -->
+                        <span>🥓</span><!-- ベーコン -->
+                    </div>
+                    <div class="input-row">
+                        <button type="button" id="btn-select-icon" class="icon-input-btn">🫑</button>
+                        <input type="hidden" id="new-veg-icon" value="🫑">
+                        <input type="text" id="new-veg-name" class="num-input name-input" placeholder="食材の名前">
+                        <button id="btn-add-preset" class="btn-add normal">追加</button>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button id="close-add-modal" class="btn-cancel">閉じる</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- お手入れ決定モーダル -->
+        <div id="care-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 id="care-modal-title" class="modal-title">お手入れの確認</h3>
+                <div id="care-modal-body"></div>
+                <div class="modal-actions-group">
+                    <button id="care-modal-cancel" class="btn-cancel">キャンセル</button>
+                    <button id="care-modal-submit" class="btn-submit">記録する</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 食材取り出し確認モーダル -->
+        <div id="remove-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 id="remove-modal-title" class="modal-title">取り出しの確認</h3>
+                <p id="remove-modal-msg" class="remove-modal-text">「食材」を取り出しますか？</p>
+                <div class="modal-actions-group">
+                    <button id="remove-modal-cancel" class="btn-cancel">キャンセル</button>
+                    <button id="remove-modal-submit" class="btn-submit">取り出す</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- メモ入力用モーダル -->
+        <div id="memo-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 id="memo-modal-title" class="modal-title">味の感想・メモ</h3>
+                <textarea id="memo-input" class="memo-textarea" placeholder="漬け加減や塩味、次回試したいことなどを入力..."
+                    rows="4"></textarea>
+                <div class="modal-actions-group">
+                    <button id="memo-modal-cancel" class="btn-cancel">キャンセル</button>
+                    <button id="memo-modal-submit" class="btn-submit">保存する</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScriptファイルの読み込み -->
+    <script src="script.js"></script>
+</body>
+
+</html>
