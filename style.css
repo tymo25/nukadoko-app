@@ -16,8 +16,6 @@ body {
     height: 100%;
     height: 100dvh;
     /* スマホのアドレスバー伸縮に対応 */
-    overflow: hidden;
-    /* 画面全体のバウンス・揺れを防止 */
     position: fixed;
     /* iOSでの画面全体ズレを完全に防止 */
     color: #4a3b32;
