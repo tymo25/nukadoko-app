@@ -2,7 +2,6 @@
 // 1. 状態管理データ＆初期データ
 // ==========================================
 
-// ぬか床データ
 const nukaBeds = [
     {
         name: "ぬかみ",
@@ -22,9 +21,8 @@ const nukaBeds = [
     }
 ];
 
-let currentIndex = 0; // 現在選択中のぬか床インデックス
+let currentIndex = 0;
 
-// 初期プリセット
 const defaultPresets = [
     { name: 'きゅうり', icon: '🥒' },
     { name: 'なす', icon: '🍆' },
@@ -42,17 +40,15 @@ const defaultPresets = [
 ];
 
 let vegPresets = [];
-let vegHistory = [];        // 食材取り出し履歴（メモ付き）
-let activityHistory = [];   // 全体ログ（お手入れ＋取り出し）
-let nukaLocation = 'room';   // 'room'(常温) or 'fridge'(冷蔵庫)
-let lastMixTime = null;      // 前回かき混ぜた日時
-let isSuteMode = false;      // 「捨て漬け」モードフラグ
-let pendingRemoveIndex = null; // 取り出し対象食材のインデックス
-let currentMemoId = null;    // メモ編集中の履歴ID
-let currentCareType = "";    // 現在進行中のお手入れタイプ
+let vegHistory = [];
+let activityHistory = [];
+let lastMixTime = null;
+let isSuteMode = false;
+let pendingRemoveIndex = null;
+let currentMemoId = null;
 
-let currentCalDate = new Date(); // カレンダー表示用の年月
-let selectedDateStr = "";        // カレンダーで選択中の日付文字列 (YYYY-MM-DD)
+let currentCalDate = new Date();
+let selectedDateStr = "";
 
 
 // ==========================================
@@ -63,7 +59,6 @@ function saveData() {
     localStorage.setItem('nukaBedsData', JSON.stringify(nukaBeds));
     localStorage.setItem('activityHistoryData', JSON.stringify(activityHistory));
     localStorage.setItem('vegHistoryData', JSON.stringify(vegHistory));
-    localStorage.setItem('nukaLocationData', nukaLocation);
     localStorage.setItem('lastMixTimeData', lastMixTime || '');
 }
 
@@ -71,7 +66,6 @@ function loadData() {
     const savedBeds = localStorage.getItem('nukaBedsData');
     const savedHistory = localStorage.getItem('activityHistoryData');
     const savedVegHistory = localStorage.getItem('vegHistoryData');
-    const savedLocation = localStorage.getItem('nukaLocationData');
     const savedMixTime = localStorage.getItem('lastMixTimeData');
 
     if (savedBeds) {
@@ -89,7 +83,6 @@ function loadData() {
 
     if (savedHistory) activityHistory = JSON.parse(savedHistory);
     if (savedVegHistory) vegHistory = JSON.parse(savedVegHistory);
-    if (savedLocation) nukaLocation = savedLocation;
     if (savedMixTime) lastMixTime = new Date(savedMixTime);
 }
 
@@ -113,7 +106,7 @@ function savePresets() {
 
 
 // ==========================================
-// 3. 日時・時間計算の共通関数
+// 3. 日時・時間計算の共通関数（上下改行対応）
 // ==========================================
 
 function updateClock() {
@@ -128,12 +121,18 @@ function updateClock() {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
 
-    const clockElement = document.getElementById('current-datetime');
-    if (clockElement) {
-        clockElement.textContent = `${year}年${month}月${date}日(${day}) ${hours}:${minutes}:${seconds}`;
+    const dateElement = document.getElementById('current-datetime-date');
+    const timeElement = document.getElementById('current-datetime-time');
+
+    if (dateElement) {
+        dateElement.textContent = `${year}年${month}月${date}日(${day})`;
+    }
+    if (timeElement) {
+        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
     }
 
     updateVegetableTimes();
+    updateHomeCareDisplay();
 }
 
 function calculateDays(startDateString) {
@@ -149,11 +148,10 @@ function calculateDays(startDateString) {
     return `${diffDays}日目`;
 }
 
-function getElapsedTimeText(startAt) {
+function getElapsedTimeHours(startAt) {
     const now = new Date();
     const diffMs = now - new Date(startAt);
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    return `${diffHours}時間`;
+    return Math.floor(diffMs / (1000 * 60 * 60));
 }
 
 function getFormattedDateTime(date = new Date()) {
@@ -170,7 +168,7 @@ function getFormattedDateTime(date = new Date()) {
 
 
 // ==========================================
-// 4. ホーム画面（ぬか床 & 食材リスト）
+// 4. ホーム画面（ぬか床 & 食材リスト＆お手入れ）
 // ==========================================
 
 function updateNukaDisplay(index) {
@@ -204,36 +202,52 @@ function renderVegetables() {
         return;
     }
 
-    vegListElement.innerHTML = currentVegs.map((veg, index) => `
+    vegListElement.innerHTML = currentVegs.map((veg, index) => {
+        const hours = getElapsedTimeHours(veg.startAt);
+        return `
         <div class="veg-card ${veg.isSute ? 'sute' : ''}" onclick="removeVegetable(${index})">
-            <div class="veg-info">
-                <div class="veg-icon">${veg.icon}</div>
-                <div>
-                    <div class="veg-name">${veg.name}</div>
-                    ${veg.isSute ? '<span class="veg-subtext">🧄 捨て漬け</span>' : ''}
-                </div>
+            <div class="veg-time-badge">
+                <span class="veg-time-num">${hours}</span>
+                <span class="veg-time-label">時間</span>
             </div>
-            <div class="veg-time-box">
-                <div class="veg-elapsed" data-start="${veg.startAt}">${getElapsedTimeText(veg.startAt)}</div>
-                <div class="veg-badge">経過</div>
-            </div>
+            <div class="veg-card-icon">${veg.icon}</div>
+            <div class="veg-card-name">${veg.name}</div>
+            ${veg.isSute ? '<div class="veg-card-subtext">捨漬け</div>' : ''}
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function updateVegetableTimes() {
-    const elapsedElements = document.querySelectorAll('.veg-elapsed');
-    elapsedElements.forEach(el => {
-        const startAt = el.getAttribute('data-start');
-        if (startAt) {
-            el.textContent = getElapsedTimeText(startAt);
+    const cards = document.querySelectorAll('.veg-card');
+    cards.forEach((card, index) => {
+        const veg = nukaBeds[currentIndex].vegetables[index];
+        if (veg && veg.startAt) {
+            const numEl = card.querySelector('.veg-time-num');
+            if (numEl) {
+                numEl.textContent = getElapsedTimeHours(veg.startAt);
+            }
         }
     });
 }
 
+function updateHomeCareDisplay() {
+    const elapsedEl = document.getElementById('last-mix-elapsed');
+    if (!elapsedEl) return;
+
+    if (lastMixTime) {
+        const now = new Date();
+        const diffMs = now - new Date(lastMixTime);
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        elapsedEl.textContent = `${diffHours}時間`;
+    } else {
+        elapsedEl.textContent = '未記録';
+    }
+}
+
 
 // ==========================================
-// 5. プリセット & 食材追加・削除モーダル
+// 5. 食材プリセット & ドラッグ並び替え
 // ==========================================
 
 function renderPresets() {
@@ -257,7 +271,6 @@ function renderPresets() {
             </div>
         `;
 
-        // 1. 食材タップでぬか床に追加
         const btn = wrapper.querySelector('.preset-btn');
         btn.addEventListener('click', () => {
             if (!container.classList.contains('edit-mode')) {
@@ -265,14 +278,12 @@ function renderPresets() {
             }
         });
 
-        // 2. 削除（×）ボタン
         const delBtn = wrapper.querySelector('.preset-del-btn');
         delBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
             removePreset(index);
         });
 
-        // 3. ドラッグ＆ドロップ（並び替え）
         wrapper.addEventListener('dragstart', (e) => {
             if (!container.classList.contains('edit-mode')) {
                 e.preventDefault();
@@ -490,73 +501,7 @@ function openMemoModal(id) {
 
 
 // ==========================================
-// 7. お手入れタブ & モーダル
-// ==========================================
-
-function updateCareRemind() {
-    const elapsedEl = document.getElementById('last-mix-elapsed');
-    const guideEl = document.getElementById('care-guide-msg');
-    const roomBtn = document.getElementById('loc-room-btn');
-    const fridgeBtn = document.getElementById('loc-fridge-btn');
-
-    if (!elapsedEl || !guideEl) return;
-
-    if (nukaLocation === 'room') {
-        roomBtn?.classList.add('active');
-        fridgeBtn?.classList.remove('active');
-        guideEl.textContent = '常温保存では1日1回のかき混ぜが目安です。';
-    } else {
-        fridgeBtn?.classList.add('active');
-        roomBtn?.classList.remove('active');
-        guideEl.textContent = '冷蔵庫保存では2〜3日に1回のかき混ぜが目安です。';
-    }
-
-    if (lastMixTime) {
-        const now = new Date();
-        const diffMs = now - new Date(lastMixTime);
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        elapsedEl.textContent = `${diffHours}時間`;
-    } else {
-        elapsedEl.textContent = '未記録';
-    }
-}
-
-function openCareModal(type) {
-    currentCareType = type;
-    const careModal = document.getElementById('care-modal');
-    const careModalTitle = document.getElementById('care-modal-title');
-    const careModalBody = document.getElementById('care-modal-body');
-
-    if (!careModal || !careModalTitle || !careModalBody) return;
-
-    careModal.classList.remove('hidden');
-
-    if (type === 'mix') {
-        careModalTitle.textContent = '🥣 かき混ぜる';
-        careModalBody.innerHTML = '<p style="text-align: center; color: #6b584a; font-size: 0.9rem;">底から空気が届くようにしっかり混ぜますか？</p>';
-    } else if (type === 'water') {
-        careModalTitle.textContent = '🚰 水抜き';
-        careModalBody.innerHTML = '<p style="text-align: center; color: #6b584a; font-size: 0.9rem;">たまった水分を取り除いて硬さを調整しますか？</p>';
-    } else if (type === 'add-nuka') {
-        careModalTitle.textContent = '🌾 足しぬか';
-        careModalBody.innerHTML = `
-            <div class="input-group">
-                <label class="input-label">
-                    ぬかの量 (0〜200g)
-                    <span><input type="number" id="input-nuka" class="num-input" min="0" max="200" step="1" value="50"> g</span>
-                </label>
-                <label class="input-label">
-                    塩の量 (0〜50g)
-                    <span><input type="number" id="input-salt" class="num-input" min="0" max="50" step="0.1" value="2.5"> g</span>
-                </label>
-            </div>
-        `;
-    }
-}
-
-
-// ==========================================
-// 8. カレンダー & 履歴機能
+// 7. カレンダー & 履歴機能
 // ==========================================
 
 function addHistoryLog(icon, text) {
@@ -611,12 +556,12 @@ function renderCalendar() {
 
         const uniqueIcons = [];
         const hasRemove = dayLogs.some(l => l.text.includes('取り出しました') || l.icon === '🥕');
-        const hasMix = dayLogs.some(l => l.icon === '🥣' || l.text.includes('かき混ぜ'));
+        const hasMix = dayLogs.some(l => l.icon === '👋🏼' || l.text.includes('かき混ぜ'));
         const hasAddNuka = dayLogs.some(l => l.icon === '🌾' || l.text.includes('足しぬか'));
         const hasWater = dayLogs.some(l => l.icon === '🚰' || l.text.includes('水抜き'));
 
         if (hasRemove) uniqueIcons.push('🥕');
-        if (hasMix) uniqueIcons.push('🥣');
+        if (hasMix) uniqueIcons.push('👋🏼');
         if (hasAddNuka) uniqueIcons.push('🌾');
         if (hasWater) uniqueIcons.push('🚰');
 
@@ -671,7 +616,7 @@ function renderDayHistory(dateStr) {
 
 
 // ==========================================
-// 9. イベントリスナー登録 & 初期化
+// 8. イベントリスナー登録 & 初期化
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -685,13 +630,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCalendar();
     renderDayHistory(getFormattedDateTime().dateOnly);
     renderVegHistory();
-    updateCareRemind();
+    updateHomeCareDisplay();
 
+    // 3タブ構成のナビゲーション切り替え
     const navItems = document.querySelectorAll('.nav-item');
     const pages = [
         document.getElementById('home-page'),
         document.getElementById('history-page'),
-        document.getElementById('care-page'),
         document.getElementById('calendar-page')
     ];
 
@@ -705,6 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ぬか床スライド切替
     document.getElementById('prev-btn')?.addEventListener('click', () => {
         currentIndex = (currentIndex - 1 + nukaBeds.length) % nukaBeds.length;
         updateNukaDisplay(currentIndex);
@@ -715,6 +661,42 @@ document.addEventListener('DOMContentLoaded', () => {
         updateNukaDisplay(currentIndex);
     });
 
+    // ホーム画面のかき混ぜボタン（モーダルを開く）
+    document.getElementById('home-btn-mix')?.addEventListener('click', () => {
+        document.getElementById('mix-confirm-modal')?.classList.remove('hidden');
+    });
+
+    // かき混ぜ確認モーダルの「混ぜた」ボタン
+    document.getElementById('mix-modal-submit')?.addEventListener('click', () => {
+        addHistoryLog('👋🏼', 'ぬか床をかき混ぜました');
+        lastMixTime = new Date();
+        updateHomeCareDisplay();
+        document.getElementById('mix-confirm-modal')?.classList.add('hidden');
+    });
+
+    // かき混ぜ確認モーダルの「キャンセル」ボタン
+    document.getElementById('mix-modal-cancel')?.addEventListener('click', () => {
+        document.getElementById('mix-confirm-modal')?.classList.add('hidden');
+    });
+
+    // ホーム画面のお手入れボタン（足しぬか）
+    document.getElementById('home-btn-add-nuka')?.addEventListener('click', () => {
+        document.getElementById('care-modal')?.classList.remove('hidden');
+    });
+
+    // 足しぬかモーダルの決定
+    document.getElementById('care-modal-submit')?.addEventListener('click', () => {
+        const nukaG = document.getElementById('input-nuka')?.value || 100;
+        const saltG = document.getElementById('input-salt')?.value || 8.0;
+        addHistoryLog('🌾', `足しぬか（ぬか: ${nukaG}g / 塩: ${saltG}g）`);
+        document.getElementById('care-modal')?.classList.add('hidden');
+    });
+
+    document.getElementById('care-modal-cancel')?.addEventListener('click', () => {
+        document.getElementById('care-modal')?.classList.add('hidden');
+    });
+
+    // 食材追加モーダル関連
     document.getElementById('add-normal-btn')?.addEventListener('click', () => {
         isSuteMode = false;
         resetAddModal();
@@ -774,41 +756,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('remove-modal-cancel')?.addEventListener('click', () => {
         document.getElementById('remove-modal')?.classList.add('hidden');
         pendingRemoveIndex = null;
-    });
-
-    document.getElementById('btn-mix')?.addEventListener('click', () => openCareModal('mix'));
-    document.getElementById('btn-water')?.addEventListener('click', () => openCareModal('water'));
-    document.getElementById('btn-add-nuka')?.addEventListener('click', () => openCareModal('add-nuka'));
-
-    document.getElementById('care-modal-submit')?.addEventListener('click', () => {
-        if (currentCareType === 'mix') {
-            addHistoryLog('🥣', 'ぬか床をかき混ぜました');
-            lastMixTime = new Date();
-            updateCareRemind();
-        } else if (currentCareType === 'water') {
-            addHistoryLog('🚰', '水抜きを行いました');
-        } else if (currentCareType === 'add-nuka') {
-            const nukaG = document.getElementById('input-nuka')?.value || 0;
-            const saltG = document.getElementById('input-salt')?.value || 0;
-            addHistoryLog('🌾', `足しぬか（ぬか: ${nukaG}g / 塩: ${saltG}g）`);
-        }
-        document.getElementById('care-modal')?.classList.add('hidden');
-    });
-
-    document.getElementById('care-modal-cancel')?.addEventListener('click', () => {
-        document.getElementById('care-modal')?.classList.add('hidden');
-    });
-
-    document.getElementById('loc-room-btn')?.addEventListener('click', () => {
-        nukaLocation = 'room';
-        saveData();
-        updateCareRemind();
-    });
-
-    document.getElementById('loc-fridge-btn')?.addEventListener('click', () => {
-        nukaLocation = 'fridge';
-        saveData();
-        updateCareRemind();
     });
 
     document.getElementById('cal-prev')?.addEventListener('click', () => {

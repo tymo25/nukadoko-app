@@ -1,5 +1,5 @@
 /* ==========================================
-   1. 全体のリセット・基本スタイル（スマホ画面固定対応）
+   1. 全体のリセット・基本スタイル
    ========================================== */
 * {
     box-sizing: border-box;
@@ -7,25 +7,16 @@
     padding: 0;
 }
 
-html,
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #fdfbf7;
-    width: 100%;
-    height: 100%;
-    height: 100dvh;
-    color: #4a3b32;
-    touch-action: manipulation;
-    overflow: hidden;
-}
-
-body {
+    background-color: #f0e6d2;
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 100vh;
+    color: #4a3b32;
 }
 
-/* 共通ユーティリティクラス */
 .hidden {
     display: none !important;
 }
@@ -47,39 +38,45 @@ body {
    ========================================== */
 .app-container {
     width: 100%;
-    height: 100%;
-    height: 100dvh;
+    max-width: 390px;
+    height: 100vh;
+    max-height: 844px;
     background-color: #fdfbf7;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border-radius: 24px;
     overflow: hidden;
     position: relative;
 }
 
-/* ヘッダー */
+/* ヘッダー（日付と時間を改行＆時間を大きく） */
 .header {
-    padding: 20px 16px 12px;
+    padding: 16px 16px 8px;
     text-align: center;
     background-color: #fdfbf7;
-    flex-shrink: 0;
 }
 
-.datetime {
-    font-size: 1.1rem;
+.datetime-date {
+    font-size: 1.5rem;
     font-weight: 600;
+    color: #8c7462;
+}
+
+.datetime-time {
+    font-size: 1.6rem;
+    font-weight: bold;
     color: #6b584a;
     letter-spacing: 0.5px;
+    margin-top: 2px;
 }
 
-/* メインコンテンツエリア */
 .main-content {
-    padding: 0 16px 110px;
+    padding: 0 16px 90px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    /* 中身だけスクロール可能にする */
-    -webkit-overflow-scrolling: touch;
+    overflow: auto;
     gap: 16px;
 }
 
@@ -90,16 +87,14 @@ body {
     width: 100%;
 }
 
-/* 共通カード */
 .card {
     background-color: #ffffff;
     border-radius: 20px;
-    padding: 20px;
+    padding: 18px;
     box-shadow: 0 4px 15px rgba(127, 85, 57, 0.08);
     border: 1px solid #f0e6d2;
 }
 
-/* セクションタイトル */
 .section-title {
     font-size: 1.05rem;
     color: #6b584a;
@@ -114,42 +109,45 @@ body {
    3. ホーム画面用スタイル
    ========================================== */
 .nuka-info {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     text-align: center;
 }
 
 .nuka-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: #4a3b32;
-    display: inline-block;
-    margin-right: 8px;
+    margin-bottom: 2px;
+}
+
+.nuka-days-wrapper {
+    display: flex;
+    justify-content: center;
 }
 
 .nuka-days {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: #8c7462;
     background-color: #f7f1e5;
-    padding: 4px 10px;
-    border-radius: 12px;
+    padding: 2px 10px;
+    border-radius: 10px;
     font-weight: 500;
 }
 
-/* イラスト・スライドボタン */
 .container-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 10px 0;
+    margin: 6px 0;
 }
 
 .slide-btn {
     background: none;
     border: none;
     outline: none;
-    font-size: 4.8rem;
+    font-size: 4.2rem;
     color: #b08968;
     cursor: pointer;
-    padding: 0 12px;
+    padding: 0 8px;
     line-height: 1;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -162,12 +160,11 @@ body {
     align-items: center;
 }
 
-/* ページネーション（ドット） */
 .dots {
     display: flex;
     justify-content: center;
     gap: 6px;
-    margin-top: 8px;
+    margin-top: 4px;
 }
 
 .dot {
@@ -181,6 +178,60 @@ body {
     background-color: #7f5539;
     width: 18px;
     border-radius: 4px;
+}
+
+/* ホーム画面のお手入れ記録エリア */
+.home-care-section {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed #f0e6d2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.home-care-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.remind-elapsed-home {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #d97706;
+}
+
+/* アクションボタン（4つをコンパクトに配置） */
+.home-action-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.home-care-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.home-care-btn {
+    flex: 1;
+    padding: 8px 0;
+    background-color: #fdfbf7;
+    border: 1.5px solid #f0e6d2;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #4a3b32;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.home-care-btn:active {
+    background-color: #f7f1e5;
+    transform: scale(0.97);
 }
 
 /* 食材リストエリア */
@@ -197,16 +248,21 @@ body {
     padding: 0 4px;
 }
 
+.section-title {
+    font-size: 0.9rem;
+    color: #8c7462;
+    font-weight: 00;
+}
+
 .add-btn-group {
     display: flex;
     gap: 6px;
 }
 
-/* ボタン共通スタイル */
 .btn-add {
     padding: 6px 12px;
     font-size: 0.78rem;
-    font-weight: 700;
+    font-weight: 800;
     border-radius: 20px;
     border: none;
     outline: none;
@@ -237,26 +293,29 @@ body {
 
 .vegetable-list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
     background-color: #f7f1e5;
-    padding: 12px;
-    border-radius: 20px;
+    padding: 8px;
+    border-radius: 18px;
     border: 2px dashed #d9c4b0;
 }
 
-/* 食材カード */
+/* 正方形カード＆右上丸バッジ仕様の食材カード */
 .veg-card {
+    aspect-ratio: 1 / 1;
+    /* 正方形にする */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
     background-color: #ffffff;
-    padding: 10px 12px;
-    border-radius: 14px;
-    box-shadow: 0 3px 8px rgba(127, 85, 57, 0.08);
+    padding: 4px 2px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(127, 85, 57, 0.08);
     border: 1px solid #ebdccb;
-    min-height: 95px;
     position: relative;
+    overflow: visible;
     cursor: pointer;
     transition: transform 0.15s ease;
 }
@@ -266,212 +325,80 @@ body {
 }
 
 .veg-card.sute {
-    background-color: #fcf8f2;
-    border: 1px solid #e8dac8;
+    background-color: #f2e8dc;
+    border: 1px solid #d9c4b0;
 }
 
-.veg-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.veg-icon {
-    font-size: 1.6rem;
-    background-color: #fdf8f2;
-    width: 38px;
-    height: 38px;
+/* 大きめアイコン */
+.veg-card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
-    flex-shrink: 0;
 }
 
-.veg-name {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #4a3b32;
-    line-height: 1.2;
-}
-
-.veg-time-box {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-top: 8px;
-    padding-top: 6px;
-    border-top: 1px dashed #f0e6d2;
-}
-
-.veg-elapsed {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #d97706;
-}
-
-.veg-card.sute .veg-elapsed {
-    color: #a16207;
-}
-
-.veg-badge {
-    font-size: 0.7rem;
-    color: #a09080;
-}
-
-/* ==========================================
-   4. お手入れ画面用スタイル
-   ========================================== */
-.care-action-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.care-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    background-color: #fdfbf7;
-    border: 1.5px solid #f0e6d2;
-    border-radius: 16px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.care-btn:active {
-    background-color: #f7f1e5;
-    transform: scale(0.98);
-}
-
-.care-icon {
-    font-size: 2.0rem;
-}
-
-.care-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.care-name {
-    font-size: 0.95rem;
+/* 下部の食材名 */
+.veg-card-name {
+    font-size: 0.68rem;
     font-weight: bold;
     color: #4a3b32;
-}
-
-.care-desc {
-    font-size: 0.75rem;
-    color: #8c7462;
-    margin-top: 2px;
-}
-
-/* お手入れ入力フォーム */
-.input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin: 10px 0;
-}
-
-.input-label {
-    font-size: 0.85rem;
-    color: #4a3b32;
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.num-input {
-    width: 80px;
-    padding: 6px 8px;
-    border: 1.5px solid #f0e6d2;
-    border-radius: 8px;
-    text-align: right;
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: #4a3b32;
-}
-
-/* リマインドカード */
-.care-status-card {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.location-toggle-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed #f0e6d2;
-}
-
-.location-label {
-    font-size: 0.88rem;
-    font-weight: bold;
-    color: #4a3b32;
-}
-
-.toggle-buttons {
-    display: flex;
-    background-color: #f0e6d2;
-    border-radius: 12px;
-    padding: 2px;
-    gap: 2px;
-}
-
-.toggle-btn {
-    border: none;
-    background: none;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: #8c7462;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.toggle-btn.active {
-    background-color: #ffffff;
-    color: #7f5539;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-}
-
-.remind-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 0;
-}
-
-.remind-time-title {
-    font-size: 0.8rem;
-    color: #8c7462;
-}
-
-.remind-elapsed {
-    font-size: 1.6rem;
-    font-weight: bold;
-    color: #d97706;
-}
-
-.care-guide-text {
-    font-size: 0.78rem;
-    color: #6b584a;
-    margin-top: 4px;
-    line-height: 1.4;
     text-align: center;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.veg-card-subtext {
+    font-size: 0.68rem;
+    color: #a16207;
+    margin-top: 1px;
+}
+
+/* 右上の丸型バッジ（経過時間） */
+.veg-time-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: #b5372d;
+    /*border: 1.5px solid #ffffff;*/
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.veg-card.sute .veg-time-badge {
+    background-color: #a04000;
+}
+
+.veg-time-num {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.veg-card.sute .veg-time-num {
+    color: #ffffff;
+}
+
+.veg-time-label {
+    display: block;
+    font-size: 0.45rem;
+    color: #ffffff;
+    line-height: 1;
+    margin-top: 1px;
 }
 
 /* ==========================================
-   5. カレンダー・履歴画面用スタイル
+   4. カレンダー・履歴画面用スタイル
    ========================================== */
 .calendar-header {
     display: flex;
@@ -562,7 +489,7 @@ body {
     margin-bottom: 8px;
 }
 
-#history-page .card {
+.history-card-full {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -614,7 +541,7 @@ body {
 }
 
 /* ==========================================
-   6. ぬか漬け履歴（メモ）スタイル
+   5. ぬか漬け履歴（メモ）スタイル
    ========================================== */
 .veg-history-card {
     background-color: #ffffff;
@@ -705,7 +632,7 @@ body {
 }
 
 /* ==========================================
-   7. 下部固定ナビゲーションバー（しっかり固定）
+   6. 下部固定ナビゲーションバー（3タブ）
    ========================================== */
 .footer-nav {
     position: absolute;
@@ -718,10 +645,7 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding-bottom: env(safe-area-inset-bottom);
-    /* iPhoneのホームバー対策 */
-    z-index: 1000;
-    flex-shrink: 0;
+    padding-bottom: 6px;
 }
 
 .nav-item {
@@ -749,7 +673,7 @@ body {
 }
 
 /* ==========================================
-   8. モーダル（ポップアップ）スタイル
+   7. モーダル（ポップアップ）スタイル
    ========================================== */
 .modal-overlay {
     position: fixed;
@@ -791,6 +715,11 @@ body {
     flex: 1;
 }
 
+.modal-header-btns {
+    display: flex;
+    gap: 4px;
+}
+
 .remove-modal-text {
     text-align: center;
     color: #6b584a;
@@ -798,7 +727,6 @@ body {
     margin: 0;
 }
 
-/* ゴミ箱ボタン（編集モード用） */
 .icon-btn-trash {
     background: none;
     border: none;
@@ -819,13 +747,13 @@ body {
     border: 1px solid #e74c3c;
 }
 
-/* プリセット選択グリッド */
 .veg-presets {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    max-height: 460px;
+    max-height: 360px;
     overflow-y: auto;
+    padding-right: 2px;
 }
 
 .preset-wrapper {
@@ -834,6 +762,11 @@ body {
     box-sizing: border-box;
     padding-top: 4px;
     padding-right: 6px;
+}
+
+.preset-wrapper.dragging {
+    opacity: 0.4;
+    transform: scale(0.95);
 }
 
 .preset-btn {
@@ -858,35 +791,46 @@ body {
     transform: scale(0.97);
 }
 
-.preset-del-btn {
+.preset-controls {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: -2px;
+    right: -2px;
+    display: none;
+    z-index: 2;
+}
+
+.veg-presets.edit-mode .preset-controls {
+    display: flex;
+}
+
+.veg-presets.edit-mode .preset-wrapper {
+    cursor: grab;
+    user-select: none;
+}
+
+.preset-del-btn {
     background-color: #c8b9a6;
     color: #ffffff;
     border: none;
     border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 0.7rem;
+    width: 20px;
+    height: 20px;
+    font-size: 0.65rem;
     cursor: pointer;
     display: none;
     align-items: center;
     justify-content: center;
     line-height: 1;
-    z-index: 2;
+}
+
+.veg-presets.edit-mode .preset-del-btn {
+    display: flex;
 }
 
 .preset-del-btn:active {
     background-color: #a08c75;
 }
 
-/* 編集モード時のみ削除（×）ボタンを表示 */
-.veg-presets.edit-mode .preset-del-btn {
-    display: flex;
-}
-
-/* プリセット追加フォーム */
 .add-preset-form {
     border-top: 1px dashed #f0e6d2;
     padding-top: 12px;
@@ -930,7 +874,6 @@ body {
     background-color: #f0e6d2;
 }
 
-/* 絵文字選択パレット */
 .emoji-picker {
     position: absolute;
     bottom: 48px;
@@ -960,7 +903,33 @@ body {
     background-color: #f0e6d2;
 }
 
-/* モーダルボタン群 */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 10px 0;
+}
+
+.input-label {
+    font-size: 0.85rem;
+    color: #4a3b32;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.num-input {
+    width: 80px;
+    padding: 6px 8px;
+    border: 1.5px solid #f0e6d2;
+    border-radius: 8px;
+    text-align: right;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #4a3b32;
+}
+
 .modal-actions {
     display: flex;
     justify-content: center;
@@ -1008,37 +977,4 @@ body {
 .modal-actions-group .btn-submit {
     background-color: #7f5539;
     color: #ffffff;
-}
-
-/* モーダルヘッダー右側ボタン群 */
-.modal-header-btns {
-    display: flex;
-    gap: 4px;
-}
-
-/* 編集モード時の見た目とコントロール */
-.preset-controls {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    display: none;
-    z-index: 2;
-}
-
-.veg-presets.edit-mode .preset-controls {
-    display: flex;
-}
-
-.veg-presets.edit-mode .preset-wrapper {
-    cursor: grab;
-    user-select: none;
-}
-
-.veg-presets.edit-mode .preset-wrapper:active {
-    cursor: grabbing;
-}
-
-.preset-wrapper.dragging {
-    opacity: 0.4;
-    transform: scale(0.95);
 }
