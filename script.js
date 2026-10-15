@@ -649,6 +649,59 @@ function renderDayHistory(dateStr) {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 引っ張って更新
+    let touchStartY = 0;
+    let isPulling = false;
+    const ptrElement = document.getElementById('pull-to-refresh');
+    const mainContainer = document.querySelector('.main-content');
+
+    if (ptrElement && mainContainer) {
+        window.addEventListener('touchstart', (e) => {
+            if (mainContainer.scrollTop === 0) {
+                touchStartY = e.touches[0].clientY;
+                isPulling = true;
+            } else {
+                isPulling = false;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isPulling) return;
+            const touchY = e.touches[0].clientY;
+            const diffY = touchY - touchStartY;
+
+            if (diffY > 0 && mainContainer.scrollTop === 0) {
+                const pullDistance = Math.min(diffY * 0.4, 60);
+                ptrElement.style.transform = `translateY(${pullDistance}px)`;
+
+                if (pullDistance > 45) {
+                    ptrElement.querySelector('.pull-text').textContent = '指を離して更新';
+                } else {
+                    ptrElement.querySelector('.pull-text').textContent = '下に引っ張って更新';
+                }
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+            if (!isPulling) return;
+            isPulling = false;
+
+            const touchEndY = e.changedTouches[0].clientY;
+            const diffY = touchEndY - touchStartY;
+
+            if (diffY > 110 && mainContainer.scrollTop === 0) {
+                ptrElement.classList.add('refreshing');
+                ptrElement.style.transform = `translateY(50px)`;
+                ptrElement.querySelector('.pull-text').textContent = '更新中...';
+
+                setTimeout(() => {
+                    location.reload();
+                }, 400);
+            } else {
+                ptrElement.style.transform = `translateY(0px)`;
+            }
+        });
+    }
     loadData();
     loadPresets();
 
