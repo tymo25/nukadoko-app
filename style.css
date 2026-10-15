@@ -1063,21 +1063,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    background-color: #f7f1e5;
+    gap: 6px;
+    background-color: #fdfbf7;
     color: #6b584a;
-    font-size: 0.85rem;
-    font-weight: bold;
+    font-size: 0.8rem;
+    font-weight: 500;
     transition: transform 0.2s ease;
     z-index: 1000;
 }
 
 .pull-spinner {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    display: inline-block;
     transition: transform 0.3s ease;
 }
 
-/* 引っ張られている最中にスピナーを回転させるアニメーション等 */
+/* 更新中にシンプルにクルッと回転させるアニメーション */
 .pull-to-refresh.refreshing .pull-spinner {
     animation: spin 0.8s linear infinite;
 }
