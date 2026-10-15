@@ -49,7 +49,7 @@ let currentMemoId = null;
 
 let currentCalDate = new Date();
 let selectedDateStr = "";
-let pendingRemoveVegHistoryId = null; // 削除対象の履歴IDを保持
+let pendingRemoveVegHistoryId = null;
 
 
 // ==========================================
@@ -84,7 +84,6 @@ function loadData() {
 
     if (savedHistory) activityHistory = JSON.parse(savedHistory);
     if (savedVegHistory) vegHistory = JSON.parse(savedVegHistory);
-    // 修正：保存されていたかき混ぜ時間を正しくDate型に変換する
     if (savedMixTime) lastMixTime = new Date(savedMixTime);
 }
 
@@ -108,7 +107,7 @@ function savePresets() {
 
 
 // ==========================================
-// 3. 日時・時間計算の共通関数（上下改行対応）
+// 3. 日時・時間計算の共通関数
 // ==========================================
 
 function updateClock() {
@@ -408,8 +407,10 @@ function removeVegetable(index) {
 
     const confirmModal = document.getElementById('remove-modal');
     const confirmText = document.getElementById('remove-modal-msg');
+    const confirmSubmitBtn = document.getElementById('remove-modal-submit');
 
     if (confirmText) confirmText.textContent = `「${veg.name}」を取り出しますか？`;
+    if (confirmSubmitBtn) confirmSubmitBtn.textContent = "取り出す";
     if (confirmModal) confirmModal.classList.remove('hidden');
 }
 
@@ -473,11 +474,11 @@ function renderVegHistory() {
     }
 
     container.innerHTML = vegHistory.map(item => `
-        <div class="history-item-wrapper" data-id="${item.id}">
-            <!-- スライドすると裏から出てくる削除ボタン -->
+        <div class="history-item-wrapper">
+            <!-- スライドすると出てくる削除ボタン -->
             <div class="history-delete-action" onclick="promptRemoveVegHistory(${item.id})">削除</div>
             
-            <!-- スライドするカード本体 -->
+            <!-- カード本体 -->
             <div class="veg-history-card history-card-content">
                 <div class="veg-history-header">
                     <div class="veg-history-title">
@@ -493,7 +494,7 @@ function renderVegHistory() {
         </div>
     `).join('');
 
-    // カードを左にスワイプしたときのタッチ操作（スライド）の仕組みを適用
+    // スライド操作の有効化
     setupHistorySwipe();
 }
 
@@ -518,9 +519,11 @@ function promptRemoveVegHistory(id) {
     const confirmModal = document.getElementById('remove-modal');
     const confirmTitle = document.getElementById('remove-modal-title');
     const confirmText = document.getElementById('remove-modal-msg');
+    const confirmSubmitBtn = document.getElementById('remove-modal-submit');
 
     if (confirmTitle) confirmTitle.textContent = "履歴の削除";
     if (confirmText) confirmText.textContent = `「${target.name}」の履歴を本当に削除しますか？`;
+    if (confirmSubmitBtn) confirmSubmitBtn.textContent = "削除";
     if (confirmModal) confirmModal.classList.remove('hidden');
 }
 
@@ -752,7 +755,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('mix-confirm-modal')?.classList.add('hidden');
     });
 
-    // かき混ぜ確認モーダルの「キャンセル」ボタン
     document.getElementById('mix-modal-cancel')?.addEventListener('click', () => {
         document.getElementById('mix-confirm-modal')?.classList.add('hidden');
     });
@@ -762,7 +764,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('care-modal')?.classList.remove('hidden');
     });
 
-    // 足しぬかモーダルの決定
     document.getElementById('care-modal-submit')?.addEventListener('click', () => {
         const nukaG = document.getElementById('input-nuka')?.value || 100;
         const saltG = document.getElementById('input-salt')?.value || 8.0;
@@ -775,10 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 食材追加モーダル関連
-    // 本漬け用アイコン（合格いただいた壺）
     const potSvg = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="10.5" y="2" width="3" height="2.5" rx="0.5"></rect><ellipse cx="12" cy="5.5" rx="6.5" ry="1.5"></ellipse><path d="M5.5 8 C4.5 12 4.5 16 7.5 19 C9.5 21 14.5 21 16.5 19 C19.5 16 19.5 12 18.5 8 Z"></path></svg>`;
-
-    // 捨漬け用アイコン（親指と人差し指でつまんでいる手・24px線画）
     const handSvg = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14C4 11.5 6 9.5 8.5 9.5C9.5 9.5 10.5 9.8 11.2 10.4C13.2 8.5 16 8 18 9.5C19.5 10.8 19.8 13 18.8 14.8C18 16.2 16.8 17.5 15 19.5L14.2 20.2C13.8 20.6 13.2 20.8 12.6 20.8H10.5C9.2 20.8 8 20.2 7.2 19.2L5 16.5C4.4 15.8 4 14.9 4 14Z"></path><path d="M8.5 9.5C9.2 7.5 11 5.8 13.5 5.5C15.5 5.2 17.5 6.2 18.2 8"></path><path d="M11.2 10.4C12.2 11.2 13.5 13 13.8 15.5"></path></svg>`;
 
     document.getElementById('add-normal-btn')?.addEventListener('click', () => {
@@ -786,18 +784,9 @@ document.addEventListener('DOMContentLoaded', () => {
         resetAddModal();
         const modalTitle = document.getElementById('modal-title');
         if (modalTitle) {
-            modalTitle.innerHTML = `<span id="modal-icon-container" style="display: inline-flex; align-items: center; vertical-align: middle; margin-right: 6px;">${potSvg}</span> 本漬けする食材を選ぶ`;
+            modalTitle.innerHTML = `<span id="modal-icon-container" class="modal-title-icon">${potSvg}</span> 本漬けする食材を選ぶ`;
         }
         document.getElementById('add-modal')?.classList.remove('hidden');
-    });
-
-    // ぬか漬け履歴タブのゴミ箱アイコン切替
-    document.getElementById('btn-toggle-edit-veg-history')?.addEventListener('click', () => {
-        const historyList = document.getElementById('veg-history-list');
-        const trashBtn = document.getElementById('btn-toggle-edit-veg-history');
-
-        historyList?.classList.toggle('edit-mode');
-        trashBtn?.classList.toggle('active');
     });
 
     document.getElementById('add-sute-btn')?.addEventListener('click', () => {
@@ -805,7 +794,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetAddModal();
         const modalTitle = document.getElementById('modal-title');
         if (modalTitle) {
-            modalTitle.innerHTML = `<span id="modal-icon-container" style="display: inline-flex; align-items: center; vertical-align: middle; margin-right: 6px;">${handSvg}</span> 捨て漬けする食材を選ぶ`;
+            modalTitle.innerHTML = `<span id="modal-icon-container" class="modal-title-icon">${handSvg}</span> 捨て漬けする食材を選ぶ`;
         }
         document.getElementById('add-modal')?.classList.remove('hidden');
     });
@@ -854,19 +843,13 @@ document.addEventListener('DOMContentLoaded', () => {
     removeSubmitBtn.replaceWith(removeSubmitBtn.cloneNode(true));
     document.getElementById('remove-modal-submit')?.addEventListener('click', () => {
         if (pendingRemoveVegHistoryId !== null) {
-            // ぬか漬け履歴の削除処理
             vegHistory = vegHistory.filter(item => item.id !== pendingRemoveVegHistoryId);
             renderVegHistory();
             saveData();
 
             document.getElementById('remove-modal')?.classList.add('hidden');
             pendingRemoveVegHistoryId = null;
-
-            // 削除後も編集モードを維持
-            document.getElementById('veg-history-list')?.classList.add('edit-mode');
-            document.getElementById('btn-toggle-edit-veg-history')?.classList.add('active');
         } else {
-            // 食材の取り出し処理
             executeRemoveVegetable();
         }
     });
@@ -925,7 +908,6 @@ function setupHistorySwipe() {
         content.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
             isSwiping = true;
-            // 他ですでに開いているスワイプがあれば閉じる
             wrappers.forEach(w => {
                 if (w !== wrapper) w.classList.remove('swiped');
             });
@@ -936,12 +918,9 @@ function setupHistorySwipe() {
             currentX = e.touches[0].clientX;
             const diffX = currentX - startX;
 
-            // 左に引っ張ったとき
             if (diffX < -30) {
                 wrapper.classList.add('swiped');
-            }
-            // 右に戻したとき
-            else if (diffX > 30) {
+            } else if (diffX > 30) {
                 wrapper.classList.remove('swiped');
             }
         }, { passive: true });

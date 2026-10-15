@@ -50,7 +50,6 @@ body {
     position: relative;
 }
 
-/* ヘッダー（日付と時間を改行＆時間を大きく） */
 .header {
     padding: 16px 16px 8px;
     text-align: center;
@@ -180,7 +179,6 @@ body {
     border-radius: 4px;
 }
 
-/* ホーム画面のお手入れ記録エリア */
 .home-care-section {
     margin-top: 12px;
     padding-top: 10px;
@@ -203,17 +201,11 @@ body {
     color: #d97706;
 }
 
-/* アクションボタン（4つをコンパクトに配置） */
 .home-action-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
     margin-top: 4px;
-}
-
-.home-care-btns {
-    display: flex;
-    gap: 8px;
 }
 
 .btn-add,
@@ -242,33 +234,28 @@ body {
     box-shadow: 0 1px 3px rgba(127, 85, 57, 0.1);
 }
 
-/* 1. 本漬けボタン */
 .btn-add.normal {
     background-color: #7f5539;
     color: #ffffff;
 }
 
-/* 2. 捨て漬けボタン */
 .btn-add.sute {
     background-color: #d4b896;
     color: #4a3b32;
 }
 
-/* 3. かき混ぜボタン */
 #home-btn-mix {
     background-color: #fdfbf7;
     color: #6b584a;
     border: 1.5px solid #d9c4b0;
 }
 
-/* 4. 足しぬかボタン */
 #home-btn-add-nuka {
     background-color: #fdfbf7;
     color: #6b584a;
     border: 1.5px solid #d9c4b0;
 }
 
-/* 食材リストエリア */
 .vegetable-section {
     display: flex;
     flex-direction: column;
@@ -282,49 +269,6 @@ body {
     padding: 0 4px;
 }
 
-.section-title {
-    font-size: 0.9rem;
-    color: #8c7462;
-    font-weight: 00;
-}
-
-.add-btn-group {
-    display: flex;
-    gap: 6px;
-}
-
-.btn-add {
-    padding: 6px 12px;
-    font-size: 0.78rem;
-    font-weight: 800;
-    border-radius: 20px;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-}
-
-.btn-add:active {
-    transform: scale(0.95);
-    opacity: 0.85;
-}
-
-.btn-add.normal {
-    background-color: #7f5539;
-    color: #ffffff;
-    box-shadow: 0 2px 6px rgba(127, 85, 57, 0.25);
-}
-
-.btn-add.sute {
-    background-color: #e0d0c0;
-    color: #524032;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
 .vegetable-list {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -335,10 +279,8 @@ body {
     border: 2px dashed #d9c4b0;
 }
 
-/* 正方形カード＆右上丸バッジ仕様の食材カード */
 .veg-card {
     aspect-ratio: 1 / 1;
-    /* 正方形にする */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -360,10 +302,9 @@ body {
 
 .veg-card.sute {
     background-color: #f2e8dc;
-    border: 1px solid #d9c4b0;
+    border: 1.5px solid #d9c4b0;
 }
 
-/* 大きめアイコン */
 .veg-card-icon {
     font-size: 1.8rem;
     margin-bottom: 2px;
@@ -372,7 +313,6 @@ body {
     justify-content: center;
 }
 
-/* 下部の食材名 */
 .veg-card-name {
     font-size: 0.7rem;
     font-weight: bold;
@@ -385,13 +325,6 @@ body {
     max-width: 100%;
 }
 
-.veg-card-subtext {
-    font-size: 0.68rem;
-    color: #a16207;
-    margin-top: 1px;
-}
-
-/* 右上の丸型バッジ（経過時間） */
 .veg-time-badge {
     position: absolute;
     top: -8px;
@@ -416,10 +349,6 @@ body {
     font-weight: 700;
     color: #ffffff;
     line-height: 1;
-}
-
-.veg-card.sute .veg-time-num {
-    color: #ffffff;
 }
 
 .veg-time-label {
@@ -529,6 +458,11 @@ body {
     min-height: 0;
 }
 
+/* 履歴のタイトル中央揃え用 */
+.history-header-center {
+    justify-content: center !important;
+}
+
 .history-list {
     display: flex;
     flex-direction: column;
@@ -579,16 +513,13 @@ body {
 .veg-history-card {
     position: relative;
     background-color: #ffffff;
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 12px 14px;
-    border: 1px solid #f0e6d2;
+    border: 1.5px solid #e6dcd0;
     display: flex;
     flex-direction: column;
     gap: 8px;
     text-align: left;
-    overflow: visible;
-    margin-top: 9px;
-    margin-right: 8px;
 }
 
 .veg-history-header {
@@ -615,17 +546,6 @@ body {
 .veg-history-time {
     font-size: 0.75rem;
     color: #8c7462;
-}
-
-.edit-icon {
-    font-size: 0.85rem;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.edit-icon:active {
-    opacity: 1;
 }
 
 .veg-history-memo-box {
@@ -666,40 +586,6 @@ body {
 
 .memo-textarea:focus {
     border-color: #b08968;
-}
-
-/* 編集モード時に右上に現れるバツ削除ボタン */
-.veg-history-controls {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    display: none;
-    z-index: 10;
-}
-
-.history-list.edit-mode .veg-history-controls {
-    display: flex;
-}
-
-.veg-history-del-btn {
-    background-color: #c8b9a6;
-    color: #ffffff;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    line-height: 1;
-    padding: 0;
-}
-
-.veg-history-del-btn:active {
-    transform: scale(0.92);
 }
 
 /* ==========================================
@@ -779,12 +665,21 @@ body {
 }
 
 .modal-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #4a3b32;
-    text-align: center;
-    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     flex: 1;
+    margin: 0;
+}
+
+.modal-title-icon {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
 }
 
 .modal-header-btns {
@@ -802,6 +697,7 @@ body {
 .icon-btn-trash {
     background: none;
     border: none;
+    color: #7f5539;
     font-size: 1.1rem;
     cursor: pointer;
     padding: 4px;
@@ -812,6 +708,7 @@ body {
 
 .icon-btn-trash:active {
     background-color: #f0e6d2;
+    color: #b08968;
 }
 
 .icon-btn-trash.active {
@@ -1008,18 +905,6 @@ body {
     margin-top: 4px;
 }
 
-.btn-cancel {
-    width: 100%;
-    padding: 10px 0;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border: none;
-    background-color: #f0e6d2;
-    color: #6b584a;
-    cursor: pointer;
-}
-
 .modal-actions-group {
     display: flex;
     flex-direction: row;
@@ -1052,7 +937,7 @@ body {
 }
 
 /* ==========================================
-    8. 引っ張って更新（プル・フォー・リフレッシュ）スタイル
+    8. 引っ張って更新スタイル
    ========================================== */
 .pull-to-refresh {
     position: absolute;
@@ -1078,7 +963,6 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* 更新中にシンプルにクルッと回転させるアニメーション */
 .pull-to-refresh.refreshing .pull-spinner {
     animation: spin 0.8s linear infinite;
 }
@@ -1098,9 +982,12 @@ body {
    ========================================== */
 .history-item-wrapper {
     position: relative;
-    overflow: hidden;
+    width: 100%;
     margin-bottom: 10px;
     border-radius: 12px;
+    background-color: #7f5539;
+    /* スライドしたときに見える削除ボタンの背景色 */
+    overflow: hidden;
 }
 
 .history-delete-action {
@@ -1109,23 +996,26 @@ body {
     right: 0;
     width: 75px;
     height: 100%;
-    background-color: #ff5252;
+    background-color: #7f5539;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.85rem;
     font-weight: bold;
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
     z-index: 1;
     cursor: pointer;
 }
 
 .history-card-content {
     position: relative;
+    background-color: #fdfbf7;
+    border: 1.5px solid #e6dcd0;
+    border-radius: 12px;
+    padding: 12px 14px;
     z-index: 2;
-    transition: transform 0.2s ease;
+    transform: translateX(0);
+    transition: transform 0.25s ease;
     touch-action: pan-y;
 }
 
