@@ -58,7 +58,7 @@ body {
 }
 
 .datetime-date {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 600;
     color: #8c7462;
 }
@@ -1052,7 +1052,7 @@ body {
 }
 
 /* ==========================================
-   引っ張って更新（プル・フォー・リフレッシュ）スタイル
+    8. 引っ張って更新（プル・フォー・リフレッシュ）スタイル
    ========================================== */
 .pull-to-refresh {
     position: absolute;
@@ -1091,4 +1091,44 @@ body {
     100% {
         transform: rotate(360deg);
     }
+}
+
+/* ==========================================
+    9. ぬか漬け履歴カードの左スライド削除スタイル
+   ========================================== */
+.history-item-wrapper {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border-radius: 12px;
+}
+
+.history-delete-action {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 75px;
+    height: 100%;
+    background-color: #ff5252;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.history-card-content {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.2s ease;
+    touch-action: pan-y;
+}
+
+.history-item-wrapper.swiped .history-card-content {
+    transform: translateX(-75px);
 }

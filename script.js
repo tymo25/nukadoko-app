@@ -473,32 +473,28 @@ function renderVegHistory() {
     }
 
     container.innerHTML = vegHistory.map(item => `
-        <div class="veg-history-card">
-            <!-- 編集モード時の右上の削除ボタン -->
-            <div class="veg-history-controls">
-                <button class="veg-history-del-btn" data-id="${item.id}" title="削除">×</button>
-            </div>
-            <div class="veg-history-header">
-                <div class="veg-history-title">
-                    <span>${item.icon}</span>
-                    <span>${item.isSute ? '【捨漬け】' : ''}${item.name}</span>
+        <div class="history-item-wrapper" data-id="${item.id}">
+            <!-- スライドすると裏から出てくる削除ボタン -->
+            <div class="history-delete-action" onclick="promptRemoveVegHistory(${item.id})">削除</div>
+            
+            <!-- スライドするカード本体 -->
+            <div class="veg-history-card history-card-content">
+                <div class="veg-history-header">
+                    <div class="veg-history-title">
+                        <span>${item.icon}</span>
+                        <span>${item.isSute ? '【捨漬け】' : ''}${item.name}</span>
+                    </div>
+                    <div class="veg-history-right">
+                        <span class="veg-history-time">${item.timeText ? '⏱ ' + item.timeText : ''}</span>
+                    </div>
                 </div>
-                <div class="veg-history-right">
-                    <span class="veg-history-time">${item.timeText ? '⏱ ' + item.timeText : ''}</span>
-                </div>
+                <div class="veg-history-memo-box" onclick="openMemoModal(${item.id})">${item.memo ? item.memo : '<span class="no-memo">タップしてメモ・感想を入力...</span>'}</div>
             </div>
-            <div class="veg-history-memo-box" onclick="openMemoModal(${item.id})">${item.memo ? item.memo : '<span class="no-memo">タップしてメモ・感想を入力...</span>'}</div>
         </div>
     `).join('');
 
-    // 生成されたバツボタンに削除確認モーダルを開くイベントを付与
-    container.querySelectorAll('.veg-history-del-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = parseInt(btn.dataset.id, 10);
-            promptRemoveVegHistory(id);
-        });
-    });
+    // カードを左にスワイプしたときのタッチ操作（スライド）の仕組みを適用
+    setupHistorySwipe();
 }
 
 function openMemoModal(id) {
@@ -779,11 +775,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 食材追加モーダル関連
+    // 本漬け用アイコン（合格いただいた壺）
+    const potSvg = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="10.5" y="2" width="3" height="2.5" rx="0.5"></rect><ellipse cx="12" cy="5.5" rx="6.5" ry="1.5"></ellipse><path d="M5.5 8 C4.5 12 4.5 16 7.5 19 C9.5 21 14.5 21 16.5 19 C19.5 16 19.5 12 18.5 8 Z"></path></svg>`;
+
+    // 捨漬け用アイコン（親指と人差し指でつまんでいる手・24px線画）
+    const handSvg = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14C4 11.5 6 9.5 8.5 9.5C9.5 9.5 10.5 9.8 11.2 10.4C13.2 8.5 16 8 18 9.5C19.5 10.8 19.8 13 18.8 14.8C18 16.2 16.8 17.5 15 19.5L14.2 20.2C13.8 20.6 13.2 20.8 12.6 20.8H10.5C9.2 20.8 8 20.2 7.2 19.2L5 16.5C4.4 15.8 4 14.9 4 14Z"></path><path d="M8.5 9.5C9.2 7.5 11 5.8 13.5 5.5C15.5 5.2 17.5 6.2 18.2 8"></path><path d="M11.2 10.4C12.2 11.2 13.5 13 13.8 15.5"></path></svg>`;
+
     document.getElementById('add-normal-btn')?.addEventListener('click', () => {
         isSuteMode = false;
         resetAddModal();
         const modalTitle = document.getElementById('modal-title');
-        if (modalTitle) modalTitle.textContent = "🥕 本漬けする食材を選ぶ";
+        if (modalTitle) {
+            modalTitle.innerHTML = `<span id="modal-icon-container" style="display: inline-flex; align-items: center; vertical-align: middle; margin-right: 6px;">${potSvg}</span> 本漬けする食材を選ぶ`;
+        }
         document.getElementById('add-modal')?.classList.remove('hidden');
     });
 
@@ -800,7 +804,9 @@ document.addEventListener('DOMContentLoaded', () => {
         isSuteMode = true;
         resetAddModal();
         const modalTitle = document.getElementById('modal-title');
-        if (modalTitle) modalTitle.textContent = "🧄 捨て漬けする食材を選ぶ";
+        if (modalTitle) {
+            modalTitle.innerHTML = `<span id="modal-icon-container" style="display: inline-flex; align-items: center; vertical-align: middle; margin-right: 6px;">${handSvg}</span> 捨て漬けする食材を選ぶ`;
+        }
         document.getElementById('add-modal')?.classList.remove('hidden');
     });
 
@@ -901,3 +907,47 @@ document.addEventListener('DOMContentLoaded', () => {
         currentMemoId = null;
     });
 });
+
+// ==========================================
+// 9. ぬか漬け履歴カードの左スライド操作用関数
+// ==========================================
+function setupHistorySwipe() {
+    const wrappers = document.querySelectorAll('.history-item-wrapper');
+
+    wrappers.forEach(wrapper => {
+        const content = wrapper.querySelector('.history-card-content');
+        if (!content) return;
+
+        let startX = 0;
+        let currentX = 0;
+        let isSwiping = false;
+
+        content.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isSwiping = true;
+            // 他ですでに開いているスワイプがあれば閉じる
+            wrappers.forEach(w => {
+                if (w !== wrapper) w.classList.remove('swiped');
+            });
+        }, { passive: true });
+
+        content.addEventListener('touchmove', (e) => {
+            if (!isSwiping) return;
+            currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+
+            // 左に引っ張ったとき
+            if (diffX < -30) {
+                wrapper.classList.add('swiped');
+            }
+            // 右に戻したとき
+            else if (diffX > 30) {
+                wrapper.classList.remove('swiped');
+            }
+        }, { passive: true });
+
+        content.addEventListener('touchend', () => {
+            isSwiping = false;
+        });
+    });
+}
