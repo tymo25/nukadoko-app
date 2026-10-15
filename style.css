@@ -577,6 +577,7 @@ body {
    5. ぬか漬け履歴（メモ）スタイル
    ========================================== */
 .veg-history-card {
+    position: relative;
     background-color: #ffffff;
     border-radius: 16px;
     padding: 12px 14px;
@@ -585,6 +586,9 @@ body {
     flex-direction: column;
     gap: 8px;
     text-align: left;
+    overflow: visible;
+    margin-top: 9px;
+    margin-right: 8px;
 }
 
 .veg-history-header {
@@ -662,6 +666,40 @@ body {
 
 .memo-textarea:focus {
     border-color: #b08968;
+}
+
+/* 編集モード時に右上に現れるバツ削除ボタン */
+.veg-history-controls {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    display: none;
+    z-index: 10;
+}
+
+.history-list.edit-mode .veg-history-controls {
+    display: flex;
+}
+
+.veg-history-del-btn {
+    background-color: #c8b9a6;
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    line-height: 1;
+    padding: 0;
+}
+
+.veg-history-del-btn:active {
+    transform: scale(0.92);
 }
 
 /* ==========================================
@@ -849,7 +887,7 @@ body {
     border-radius: 50%;
     width: 20px;
     height: 20px;
-    font-size: 0.65rem;
+    font-size: 1.2rem;
     cursor: pointer;
     display: none;
     align-items: center;

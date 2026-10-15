@@ -95,7 +95,13 @@
             <!-- 2. ぬか漬け履歴画面 -->
             <div id="history-page" class="page-content hidden">
                 <section class="card history-card-full">
-                    <h2 class="section-title text-center mb-12">ぬか漬け履歴・メモ</h2>
+                    <!-- 変更：タイトルとゴミ箱ボタンを横並びにするヘッダー構造に変更 -->
+                    <div class="modal-header mb-12">
+                        <h2 class="section-title">ぬか漬け履歴・メモ</h2>
+                        <div class="modal-header-btns">
+                            <button id="btn-toggle-edit-veg-history" class="icon-btn-trash" title="編集モード">🗑️</button>
+                        </div>
+                    </div>
                     <p class="section-subtitle text-center mb-16">
                         取り出した食材の漬け込み時間や味の感想を残せます。
                     </p>

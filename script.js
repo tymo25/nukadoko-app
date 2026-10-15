@@ -49,6 +49,7 @@ let currentMemoId = null;
 
 let currentCalDate = new Date();
 let selectedDateStr = "";
+let pendingRemoveVegHistoryId = null; // 削除対象の履歴IDを保持
 
 
 // ==========================================
@@ -473,6 +474,10 @@ function renderVegHistory() {
 
     container.innerHTML = vegHistory.map(item => `
         <div class="veg-history-card">
+            <!-- 編集モード時の右上の削除ボタン -->
+            <div class="veg-history-controls">
+                <button class="veg-history-del-btn" data-id="${item.id}" title="削除">×</button>
+            </div>
             <div class="veg-history-header">
                 <div class="veg-history-title">
                     <span>${item.icon}</span>
@@ -485,6 +490,15 @@ function renderVegHistory() {
             <div class="veg-history-memo-box" onclick="openMemoModal(${item.id})">${item.memo ? item.memo : '<span class="no-memo">タップしてメモ・感想を入力...</span>'}</div>
         </div>
     `).join('');
+
+    // 生成されたバツボタンに削除確認モーダルを開くイベントを付与
+    container.querySelectorAll('.veg-history-del-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id, 10);
+            promptRemoveVegHistory(id);
+        });
+    });
 }
 
 function openMemoModal(id) {
@@ -497,6 +511,21 @@ function openMemoModal(id) {
 
     if (input) input.value = target.memo || '';
     if (modal) modal.classList.remove('hidden');
+}
+
+function promptRemoveVegHistory(id) {
+    const target = vegHistory.find(item => item.id === id);
+    if (!target) return;
+
+    pendingRemoveVegHistoryId = id;
+
+    const confirmModal = document.getElementById('remove-modal');
+    const confirmTitle = document.getElementById('remove-modal-title');
+    const confirmText = document.getElementById('remove-modal-msg');
+
+    if (confirmTitle) confirmTitle.textContent = "履歴の削除";
+    if (confirmText) confirmText.textContent = `「${target.name}」の履歴を本当に削除しますか？`;
+    if (confirmModal) confirmModal.classList.remove('hidden');
 }
 
 
@@ -705,6 +734,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('add-modal')?.classList.remove('hidden');
     });
 
+    // ぬか漬け履歴タブのゴミ箱アイコン切替
+    document.getElementById('btn-toggle-edit-veg-history')?.addEventListener('click', () => {
+        const historyList = document.getElementById('veg-history-list');
+        const trashBtn = document.getElementById('btn-toggle-edit-veg-history');
+
+        historyList?.classList.toggle('edit-mode');
+        trashBtn?.classList.toggle('active');
+    });
+
     document.getElementById('add-sute-btn')?.addEventListener('click', () => {
         isSuteMode = true;
         resetAddModal();
@@ -752,10 +790,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('remove-modal-submit')?.addEventListener('click', executeRemoveVegetable);
+    // 履歴削除と食材取り出しの分岐
+    const removeSubmitBtn = document.getElementById('remove-modal-submit');
+    removeSubmitBtn.replaceWith(removeSubmitBtn.cloneNode(true));
+    document.getElementById('remove-modal-submit')?.addEventListener('click', () => {
+        if (pendingRemoveVegHistoryId !== null) {
+            // ぬか漬け履歴の削除処理
+            vegHistory = vegHistory.filter(item => item.id !== pendingRemoveVegHistoryId);
+            renderVegHistory();
+            saveData();
+
+            document.getElementById('remove-modal')?.classList.add('hidden');
+            pendingRemoveVegHistoryId = null;
+
+            // 削除後も編集モードを維持
+            document.getElementById('veg-history-list')?.classList.add('edit-mode');
+            document.getElementById('btn-toggle-edit-veg-history')?.classList.add('active');
+        } else {
+            // 食材の取り出し処理
+            executeRemoveVegetable();
+        }
+    });
+
     document.getElementById('remove-modal-cancel')?.addEventListener('click', () => {
         document.getElementById('remove-modal')?.classList.add('hidden');
         pendingRemoveIndex = null;
+        pendingRemoveVegHistoryId = null;
     });
 
     document.getElementById('cal-prev')?.addEventListener('click', () => {
