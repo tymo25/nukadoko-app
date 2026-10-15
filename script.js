@@ -83,6 +83,7 @@ function loadData() {
 
     if (savedHistory) activityHistory = JSON.parse(savedHistory);
     if (savedVegHistory) vegHistory = JSON.parse(savedVegHistory);
+    // 修正：保存されていたかき混ぜ時間を正しくDate型に変換する
     if (savedMixTime) lastMixTime = new Date(savedMixTime);
 }
 
@@ -434,7 +435,7 @@ function executeRemoveVegetable() {
         }
     }
 
-    const isSuteText = veg.isSute ? '【捨て漬け】' : '';
+    const isSuteText = veg.isSute ? '【捨漬け】' : '';
     addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました${timeText}`);
 
     vegHistory.unshift({
@@ -475,11 +476,10 @@ function renderVegHistory() {
             <div class="veg-history-header">
                 <div class="veg-history-title">
                     <span>${item.icon}</span>
-                    <span>${item.isSute ? '【捨て漬け】' : ''}${item.name}</span>
+                    <span>${item.isSute ? '【捨漬け】' : ''}${item.name}</span>
                 </div>
                 <div class="veg-history-right">
                     <span class="veg-history-time">${item.timeText ? '⏱ ' + item.timeText : ''}</span>
-                    <span class="edit-icon" onclick="openMemoModal(${item.id})">✏️</span>
                 </div>
             </div>
             <div class="veg-history-memo-box" onclick="openMemoModal(${item.id})">${item.memo ? item.memo : '<span class="no-memo">タップしてメモ・感想を入力...</span>'}</div>

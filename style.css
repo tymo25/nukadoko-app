@@ -187,7 +187,7 @@ body {
     border-top: 1px dashed #f0e6d2;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .home-care-status {
@@ -207,7 +207,8 @@ body {
 .home-action-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+    gap: 4px;
+    margin-top: 4px;
 }
 
 .home-care-btns {
@@ -215,23 +216,56 @@ body {
     gap: 8px;
 }
 
+.btn-add,
 .home-care-btn {
-    flex: 1;
-    padding: 8px 0;
-    background-color: #fdfbf7;
-    border: 1.5px solid #f0e6d2;
-    border-radius: 20px;
-    font-size: 0.82rem;
+    padding: 10px 2px;
+    border-radius: 12px;
+    font-size: 0.75rem;
     font-weight: bold;
-    color: #4a3b32;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     -webkit-tap-highlight-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: none;
+    outline: none;
+    box-shadow: 0 3px 8px rgba(127, 85, 57, 0.12);
+    text-align: center;
+    white-space: nowrap;
 }
 
+.btn-add:active,
 .home-care-btn:active {
-    background-color: #f7f1e5;
-    transform: scale(0.97);
+    transform: scale(0.95);
+    box-shadow: 0 1px 3px rgba(127, 85, 57, 0.1);
+}
+
+/* 1. 本漬けボタン */
+.btn-add.normal {
+    background-color: #7f5539;
+    color: #ffffff;
+}
+
+/* 2. 捨て漬けボタン */
+.btn-add.sute {
+    background-color: #d4b896;
+    color: #4a3b32;
+}
+
+/* 3. かき混ぜボタン */
+#home-btn-mix {
+    background-color: #fdfbf7;
+    color: #6b584a;
+    border: 1.5px solid #d9c4b0;
+}
+
+/* 4. 足しぬかボタン */
+#home-btn-add-nuka {
+    background-color: #fdfbf7;
+    color: #6b584a;
+    border: 1.5px solid #d9c4b0;
 }
 
 /* 食材リストエリア */
@@ -340,7 +374,7 @@ body {
 
 /* 下部の食材名 */
 .veg-card-name {
-    font-size: 0.68rem;
+    font-size: 0.7rem;
     font-weight: bold;
     color: #4a3b32;
     text-align: center;
@@ -360,18 +394,17 @@ body {
 /* 右上の丸型バッジ（経過時間） */
 .veg-time-badge {
     position: absolute;
-    top: -6px;
-    right: -6px;
+    top: -8px;
+    right: -8px;
     background-color: #b5372d;
-    /*border: 1.5px solid #ffffff;*/
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .veg-card.sute .veg-time-badge {
@@ -379,8 +412,8 @@ body {
 }
 
 .veg-time-num {
-    font-size: 0.65rem;
-    font-weight: 800;
+    font-size: 0.9rem;
+    font-weight: 700;
     color: #ffffff;
     line-height: 1;
 }
@@ -391,7 +424,7 @@ body {
 
 .veg-time-label {
     display: block;
-    font-size: 0.45rem;
+    font-size: 0.5rem;
     color: #ffffff;
     line-height: 1;
     margin-top: 1px;
@@ -646,6 +679,7 @@ body {
     justify-content: space-around;
     align-items: center;
     padding-bottom: 6px;
+    z-index: 100;
 }
 
 .nav-item {

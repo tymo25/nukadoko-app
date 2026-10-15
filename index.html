@@ -73,10 +73,10 @@
                             <span id="last-mix-elapsed" class="remind-elapsed-home">0時間</span>
                         </div>
                         <div class="home-action-grid">
-                            <button id="add-normal-btn" class="btn-add normal">＋🥕本</button>
-                            <button id="add-sute-btn" class="btn-add sute">＋🧄捨</button>
-                            <button id="home-btn-mix" class="home-care-btn">＋👋混ぜ</button>
-                            <button id="home-btn-add-nuka" class="home-care-btn">＋🌾ぬか</button>
+                            <button id="add-normal-btn" class="btn-add normal">本漬け</button>
+                            <button id="add-sute-btn" class="btn-add sute">捨漬け</button>
+                            <button id="home-btn-mix" class="home-care-btn">かき混ぜ</button>
+                            <button id="home-btn-add-nuka" class="home-care-btn">足しぬか</button>
                         </div>
                     </div>
                 </section>
@@ -198,7 +198,8 @@
         <div id="mix-confirm-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <h3 class="modal-title">かき混ぜの確認</h3>
-                <p class="remove-modal-text">ぬか床をかき混ぜましたか？</p>
+                <p class="remove-modal-text">ぬか床を天地返しで混ぜましたか？</p>
+                <p class="remove-modal-text">常温で1日1回、冷蔵で2〜3日に1回です</p>
                 <div class="modal-actions-group">
                     <button id="mix-modal-cancel" class="btn-cancel">キャンセル</button>
                     <button id="mix-modal-submit" class="btn-submit">混ぜた</button>
@@ -210,6 +211,7 @@
         <div id="care-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <h3 id="care-modal-title" class="modal-title">足しぬか</h3>
+                <p class="remove-modal-text">1か月に1回お手入れしましょう</p>
                 <div id="care-modal-body">
                     <div class="input-group">
                         <label class="input-label">
@@ -218,7 +220,7 @@
                                     value="100"> g</span>
                         </label>
                         <label class="input-label">
-                            塩の量 (0〜50g)
+                            海塩の量 (0〜50g)
                             <span><input type="number" id="input-salt" class="num-input" min="0" max="50" step="0.1"
                                     value="8.0"> g</span>
                         </label>
