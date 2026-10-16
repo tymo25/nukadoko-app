@@ -306,8 +306,8 @@ body {
 }
 
 .veg-card-icon {
-    font-size: 1.8rem;
-    margin-bottom: 2px;
+    font-size: 1.6rem;
+    margin-bottom: 1px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -323,6 +323,15 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+}
+
+/* ▼ 捨漬けの文字サイズを小さくする指定（ここで調整できます） */
+.veg-card-subtext {
+    font-size: 0.55rem;
+    color: #8c7462;
+    font-weight: 600;
+    line-height: 1;
+    margin-top: 1px;
 }
 
 .veg-time-badge {
@@ -804,25 +813,33 @@ body {
     padding-top: 12px;
     margin-top: 8px;
     position: relative;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .add-preset-form .input-row {
     display: flex;
     gap: 6px;
     align-items: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* 追加ボタンを幅狭く、食材名前スペースを広く調整 */
+/* ▼ 追加ボタンの幅を狭くし、食材名前スペースを完全にモーダル内に収める修正 */
 .add-preset-form .name-input {
     flex: 1;
-    width: auto;
+    width: 0;
+    min-width: 0;
     text-align: left;
-    padding-left: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 #btn-add-preset {
-    width: 76px;
+    width: 64px;
     flex-shrink: 0;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .preset-error-msg {
@@ -833,7 +850,7 @@ body {
 }
 
 .icon-input-btn {
-    width: 44px;
+    width: 40px;
     height: 36px;
     background-color: #fdfbf7;
     border: 1.5px solid #f0e6d2;
@@ -843,6 +860,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .icon-input-btn:active {
@@ -911,7 +929,6 @@ body {
     margin-top: 4px;
 }
 
-/* 閉じるボタンのデザイン化（他のモーダルキャンセルボタン準拠） */
 .full-btn {
     width: 100%;
     padding: 12px 0;

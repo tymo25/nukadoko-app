@@ -11,12 +11,12 @@
 
 <body>
     <div class="app-container">
-        <!-- ▼ 追加：引っ張って更新用のインジケーター -->
+        <!-- ▼ 引っ張って更新用のインジケーター -->
         <div id="pull-to-refresh" class="pull-to-refresh">
             <div class="pull-spinner">↻</div>
             <span class="pull-text">離して更新...</span>
         </div>
-        <!-- ヘッダー（現在の日時・レイアウト変更） -->
+        <!-- ヘッダー（現在の日時） -->
         <header class="header">
             <div id="current-datetime-date" class="datetime-date">----年--月--日(-)</div>
             <div id="current-datetime-time" class="datetime-time">--:--:--</div>
@@ -28,33 +28,26 @@
             <div id="home-page" class="page-content">
                 <!-- ぬか床カード -->
                 <section class="card">
-                    <!-- ぬか床のタイトルと経過日数（上下改行） -->
                     <div class="nuka-info">
                         <h1 id="nuka-title" class="nuka-title">ぬかみ</h1>
                         <div class="nuka-days-wrapper">
                             <span id="nuka-days" class="nuka-days">34日目</span>
                         </div>
                     </div>
-                    <!-- ぬか床のイラスト（横長の台形SVG） -->
+                    <!-- ぬか床のイラスト -->
                     <div class="container-wrapper">
                         <button id="prev-btn" class="slide-btn">‹</button>
                         <div class="illustration-box">
                             <svg class="nuka-svg" viewBox="0 0 200 130" width="180" height="110">
-                                <!-- 容器のフタ（茶系） -->
                                 <rect x="12" y="22" width="176" height="10" rx="3" fill="#B08968" stroke="#7F5539"
                                     stroke-width="1.5" />
-                                <!-- 容器本体 -->
                                 <polygon points="18,32 182,32 170,118 30,118" fill="#EAE0D5" stroke="#7F5539"
                                     stroke-width="3.5" />
-                                <!-- ぬか床の中身 -->
                                 <path d="M 22 55 Q 60 50 100 55 T 178 55 L 167 114 Q 100 116 33 114 Z" fill="#DDB892" />
-
-                                <!-- ぬか床から少し顔をのぞかせる野菜たち -->
                                 <path d="M 40 62 Q 52 56 65 60" stroke="#558B2F" stroke-width="4.5"
                                     stroke-linecap="round" fill="none" />
                                 <path d="M 140 60 Q 150 55 158 58" stroke="#E65100" stroke-width="4"
                                     stroke-linecap="round" fill="none" />
-
                                 <circle cx="85" cy="85" r="1.8" fill="#B08968" />
                                 <circle cx="115" cy="95" r="2.2" fill="#B08968" />
                                 <circle cx="70" cy="70" r="1.8" fill="#B08968" />
@@ -62,7 +55,6 @@
                         </div>
                         <button id="next-btn" class="slide-btn">›</button>
                     </div>
-                    <!-- ページネーション（ドット表示） -->
                     <div class="dots">
                         <span class="dot active"></span>
                         <span class="dot"></span>
@@ -109,8 +101,6 @@
             <div id="calendar-page" class="page-content hidden">
                 <section class="card">
                     <h2 class="section-title text-center mb-12">ぬか漬け・お手入れカレンダー</h2>
-
-                    <!-- 月間カレンダーエリア -->
                     <div class="calendar-header">
                         <button id="cal-prev" class="cal-nav-btn">‹</button>
                         <span id="cal-month-title" class="cal-title">2026年 10月</span>
@@ -121,7 +111,6 @@
                     </div>
                     <div id="calendar-grid" class="calendar-grid"></div>
 
-                    <!-- 選択した日の履歴詳細エリア -->
                     <div class="selected-day-history">
                         <h3 id="selected-date-text" class="selected-date-title">日時の履歴</h3>
                         <div id="day-history-list" class="history-list"></div>
@@ -130,7 +119,7 @@
             </div>
         </main>
 
-        <!-- 下部固定ナビゲーションバー（3タブ） -->
+        <!-- 下部固定ナビゲーションバー -->
         <nav class="footer-nav">
             <button class="nav-item active">
                 <span class="nav-icon">
@@ -167,7 +156,7 @@
         </nav>
 
         <!-- ========================================== -->
-        <!-- モーダル（ポップアップ）群 -->
+        <!-- モーダル群 -->
         <!-- ========================================== -->
 
         <!-- 食材追加モーダル -->
@@ -269,7 +258,7 @@
                 </div>
                 <div class="modal-actions-group">
                     <button id="care-modal-cancel" class="btn-cancel">キャンセル</button>
-                    <button id="care-modal-submit" class="btn-submit">記録する</button>
+                    <button id="care-modal-submit" class="btn-submit">足した</button>
                 </div>
             </div>
         </div>
@@ -294,7 +283,7 @@
                     rows="4"></textarea>
                 <div class="modal-actions-group">
                     <button id="memo-modal-cancel" class="btn-cancel">キャンセル</button>
-                    <button id="memo-modal-submit" class="btn-submit">保存する</button>
+                    <button id="memo-modal-submit" class="btn-submit">保存</button>
                 </div>
             </div>
         </div>
