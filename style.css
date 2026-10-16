@@ -95,7 +95,7 @@ body {
 }
 
 .section-title {
-    font-size: 1.05rem;
+    font-size: 1.0rem;
     color: #6b584a;
 }
 
@@ -114,7 +114,7 @@ body {
 
 .nuka-title {
     font-size: 1.4rem;
-    color: #4a3b32;
+    color: #6b584a;
     margin-bottom: 2px;
 }
 
@@ -314,15 +314,19 @@ body {
 }
 
 .veg-card-name {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: bold;
     color: #4a3b32;
     text-align: center;
-    line-height: 1.1;
-    white-space: nowrap;
+    line-height: 1.15;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    word-break: break-all;
+    max-width: 90%;
+    padding: 0 2px;
 }
 
 /* ▼ 捨漬けの文字サイズを小さくする指定（ここで調整できます） */
@@ -474,8 +478,8 @@ body {
 .history-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 6px;
+    margin-top: 6px;
     flex: 1;
     overflow-y: auto;
     padding-right: 2px;
@@ -522,11 +526,11 @@ body {
     position: relative;
     background-color: #ffffff;
     border-radius: 12px;
-    padding: 12px 14px;
+    padding: 8px 12px;
     border: 1.5px solid #e6dcd0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     text-align: left;
 }
 
@@ -539,10 +543,17 @@ body {
 .veg-history-title {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
+    gap: 6px;
+    font-size: 0.9rem;
     font-weight: bold;
     color: #4a3b32;
+    flex: 1;
+    min-width: 0;
+}
+
+.veg-history-title span:last-child {
+    white-space: normal;
+    word-break: break-all;
 }
 
 .veg-history-right {
@@ -675,7 +686,7 @@ body {
 .modal-title {
     font-size: 1rem;
     font-weight: bold;
-    color: #4a3b32;
+    color: #6b584a;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -688,6 +699,7 @@ body {
     display: inline-flex;
     align-items: center;
     vertical-align: middle;
+    color: #6b584a;
 }
 
 .modal-header-btns {
@@ -705,23 +717,13 @@ body {
 .icon-btn-trash {
     background: none;
     border: none;
-    color: #7f5539;
+    color: #6b584a;
     font-size: 1.1rem;
     cursor: pointer;
     padding: 4px;
     border-radius: 8px;
     transition: background-color 0.2s;
     -webkit-tap-highlight-color: transparent;
-}
-
-.icon-btn-trash:active {
-    background-color: #f0e6d2;
-    color: #b08968;
-}
-
-.icon-btn-trash.active {
-    background-color: #f7e2e2;
-    border: 1px solid #e74c3c;
 }
 
 .veg-presets {
@@ -1024,7 +1026,7 @@ body {
 .history-item-wrapper {
     position: relative;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     border-radius: 12px;
     background-color: #7f5539;
     overflow: hidden;
