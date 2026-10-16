@@ -615,6 +615,34 @@ body {
     border-color: #b08968;
 }
 
+.btn-icon-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.btn-add,
+.home-care-btn {
+    padding: 8px 6px;
+    border-radius: 14px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    border: 1.5px solid #d9c4b0;
+    /* 薄いブラウンの枠線を統一してボタンらしく */
+    outline: none;
+    box-shadow: 0 3px 8px rgba(127, 85, 57, 0.08);
+    text-align: center;
+    white-space: nowrap;
+}
 
 /* ==========================================
    6. 下部固定ナビゲーションバー（3タブ）
