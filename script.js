@@ -888,6 +888,49 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('memo-modal')?.classList.add('hidden');
         currentMemoId = null;
     });
+
+    // CSVエクスポート機能
+    function exportVegHistoryToCSV() {
+        if (!vegHistory || vegHistory.length === 0) {
+            alert("書き出す履歴データがまだありません。");
+            return;
+        }
+
+        // CSVのヘッダー行
+        let csvContent = "\uFEFF" + "ID,食材名,アイコン,区分(捨漬け),漬け時間,取り出し日時,メモ・感想\n";
+
+        // データの各行を作成
+        vegHistory.forEach(item => {
+            const id = item.id;
+            const name = `"${(item.name || "").replace(/"/g, '""')}"`;
+            const icon = `"${(item.icon || "").replace(/"/g, '""')}"`;
+            const isSute = item.isSute ? "捨漬け" : "本漬け";
+            const timeText = `"${(item.timeText || "").replace(/"/g, '""')}"`;
+            const dateStr = `"${(item.dateStr || "").replace(/"/g, '""')}"`;
+            const memo = `"${(item.memo || "").replace(/"/g, '""')}"`;
+
+            csvContent += `${id},${name},${icon},${isSute},${timeText},${dateStr},${memo}\n`;
+        });
+
+        // Blobを作成してダウンロードリンクを生成
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        // ファイル名の設定（現在日付を入れる）
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+
+        link.setAttribute("href", url);
+        link.setAttribute("download", `nukazuke_history_${y}${m}${d}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    // CSV書き出しボタンのイベント
+    document.getElementById('export-csv-btn')?.addEventListener('click', exportVegHistoryToCSV);
 });
 
 // ==========================================

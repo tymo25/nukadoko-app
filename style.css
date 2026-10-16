@@ -472,7 +472,15 @@ body {
 }
 
 .history-header-center {
+    display: flex;
     justify-content: center !important;
+    align-items: center;
+    position: relative;
+}
+
+.history-header-center .icon-btn-trash {
+    position: absolute;
+    right: 0;
 }
 
 .history-list {
@@ -607,6 +615,7 @@ body {
     border-color: #b08968;
 }
 
+
 /* ==========================================
    6. 下部固定ナビゲーションバー（3タブ）
    ========================================== */
@@ -681,6 +690,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
 
 .modal-title {

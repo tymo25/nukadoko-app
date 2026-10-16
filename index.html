@@ -88,10 +88,19 @@
             <div id="history-page" class="page-content hidden">
                 <section class="card history-card-full">
                     <div class="modal-header history-header-center mb-12">
-                        <h2 class="section-title text-center">ぬか漬け履歴・メモ</h2>
+                        <h2 class="section-title text-center" style="flex: 1; text-align: center;">ぬか漬け履歴・メモ</h2>
+                        <!-- ▼ 右端に配置する枠なしのCSVダウンロードアイコンボタン -->
+                        <button id="export-csv-btn" class="icon-btn-trash" title="履歴をCSVで書き出す">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </button>
                     </div>
                     <p class="section-subtitle text-center mb-16">
-                        取り出した食材の漬け込み時間や味の感想を残せます。
+                        取り出した食材の時間や味の感想を残せます。
                     </p>
                     <div id="veg-history-list" class="history-list"></div>
                 </section>
