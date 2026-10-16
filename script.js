@@ -42,7 +42,7 @@ const defaultPresets = [
 let vegPresets = [];
 let vegHistory = [];
 let activityHistory = [];
-let lastMixTime = null;
+let lastMixTime = new Date(Date.now() - 17 * 60 * 60 * 1000); // 初期デモ用（17時間前）
 let isSuteMode = false;
 let pendingRemoveIndex = null;
 let currentMemoId = null;
@@ -60,7 +60,7 @@ function saveData() {
     localStorage.setItem('nukaBedsData', JSON.stringify(nukaBeds));
     localStorage.setItem('activityHistoryData', JSON.stringify(activityHistory));
     localStorage.setItem('vegHistoryData', JSON.stringify(vegHistory));
-    localStorage.setItem('lastMixTimeData', lastMixTime || '');
+    localStorage.setItem('lastMixTimeData', lastMixTime ? lastMixTime.toISOString() : '');
 }
 
 function loadData() {
@@ -84,7 +84,9 @@ function loadData() {
 
     if (savedHistory) activityHistory = JSON.parse(savedHistory);
     if (savedVegHistory) vegHistory = JSON.parse(savedVegHistory);
-    if (savedMixTime) lastMixTime = new Date(savedMixTime);
+    if (savedMixTime) {
+        lastMixTime = new Date(savedMixTime);
+    }
 }
 
 function loadPresets() {
@@ -475,10 +477,7 @@ function renderVegHistory() {
 
     container.innerHTML = vegHistory.map(item => `
         <div class="history-item-wrapper">
-            <!-- スライドすると出てくる削除ボタン -->
             <div class="history-delete-action" onclick="promptRemoveVegHistory(${item.id})">削除</div>
-            
-            <!-- カード本体 -->
             <div class="veg-history-card history-card-content">
                 <div class="veg-history-header">
                     <div class="veg-history-title">
@@ -494,7 +493,6 @@ function renderVegHistory() {
         </div>
     `).join('');
 
-    // スライド操作の有効化
     setupHistorySwipe();
 }
 
@@ -701,6 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
     loadData();
     loadPresets();
 
@@ -749,8 +748,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // かき混ぜ確認モーダルの「混ぜた」ボタン
     document.getElementById('mix-modal-submit')?.addEventListener('click', () => {
-        addHistoryLog('👋🏼', 'ぬか床をかき混ぜました');
         lastMixTime = new Date();
+        addHistoryLog('👋🏼', 'ぬか床をかき混ぜました');
         updateHomeCareDisplay();
         document.getElementById('mix-confirm-modal')?.classList.add('hidden');
     });

@@ -11,320 +11,297 @@
 
 <body>
     <div class="app-container">
-        <div class="app-container">
-            <!-- ▼ 追加：引っ張って更新用のインジケーター -->
-            <div id="pull-to-refresh" class="pull-to-refresh">
-                <div class="pull-spinner">↻</div>
-                <span class="pull-text">離して更新...</span>
-            </div>
-            <!-- ヘッダー（現在の日時・レイアウト変更） -->
-            <header class="header">
-                <div id="current-datetime-date" class="datetime-date">----年--月--日(-)</div>
-                <div id="current-datetime-time" class="datetime-time">--:--:--</div>
-            </header>
+        <!-- ▼ 追加：引っ張って更新用のインジケーター -->
+        <div id="pull-to-refresh" class="pull-to-refresh">
+            <div class="pull-spinner">↻</div>
+            <span class="pull-text">離して更新...</span>
+        </div>
+        <!-- ヘッダー（現在の日時・レイアウト変更） -->
+        <header class="header">
+            <div id="current-datetime-date" class="datetime-date">----年--月--日(-)</div>
+            <div id="current-datetime-time" class="datetime-time">--:--:--</div>
+        </header>
 
-            <!-- メインコンテンツ -->
-            <main class="main-content">
-                <!-- 1. ホーム画面 -->
-                <div id="home-page" class="page-content">
-                    <!-- ぬか床カード -->
-                    <section class="card">
-                        <!-- ぬか床のタイトルと経過日数（上下改行） -->
-                        <div class="nuka-info">
-                            <h1 id="nuka-title" class="nuka-title">ぬかみ</h1>
-                            <div class="nuka-days-wrapper">
-                                <span id="nuka-days" class="nuka-days">34日目</span>
-                            </div>
-                        </div>
-                        <!-- ぬか床のイラスト（横長の台形SVG） -->
-                        <div class="container-wrapper">
-                            <button id="prev-btn" class="slide-btn">‹</button>
-                            <div class="illustration-box">
-                                <svg class="nuka-svg" viewBox="0 0 200 130" width="180" height="110">
-                                    <!-- 容器のフタ（茶系） -->
-                                    <rect x="12" y="22" width="176" height="10" rx="3" fill="#B08968" stroke="#7F5539"
-                                        stroke-width="1.5" />
-                                    <!-- 容器本体 -->
-                                    <polygon points="18,32 182,32 170,118 30,118" fill="#EAE0D5" stroke="#7F5539"
-                                        stroke-width="3.5" />
-                                    <!-- ぬか床の中身 -->
-                                    <path d="M 22 55 Q 60 50 100 55 T 178 55 L 167 114 Q 100 116 33 114 Z"
-                                        fill="#DDB892" />
-
-                                    <!-- ぬか床から少し顔をのぞかせる野菜たち -->
-                                    <!-- 1. きゅうり（緑の曲がり棒） -->
-                                    <path d="M 40 62 Q 52 56 65 60" stroke="#558B2F" stroke-width="4.5"
-                                        stroke-linecap="round" fill="none" />
-                                    <!-- 2. にんじん（オレンジ色の端っこ） -->
-                                    <path d="M 140 60 Q 150 55 158 58" stroke="#E65100" stroke-width="4"
-                                        stroke-linecap="round" fill="none" />
-
-                                    <!-- つぶつぶ -->
-                                    <circle cx="85" cy="85" r="1.8" fill="#B08968" />
-                                    <circle cx="115" cy="95" r="2.2" fill="#B08968" />
-                                    <circle cx="70" cy="70" r="1.8" fill="#B08968" />
-                                </svg>
-                            </div>
-                            <button id="next-btn" class="slide-btn">›</button>
-                        </div>
-                        <!-- ページネーション（ドット表示） -->
-                        <div class="dots">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                        </div>
-
-                        <!-- お手入れ記録エリア -->
-                        <div class="home-care-section">
-                            <div class="home-care-status">
-                                <span class="remind-time-title">最後のかき混ぜから：</span>
-                                <span id="last-mix-elapsed" class="remind-elapsed-home">0時間</span>
-                            </div>
-                            <div class="home-action-grid">
-                                <button id="add-normal-btn" class="btn-add normal">本漬け</button>
-                                <button id="add-sute-btn" class="btn-add sute">捨漬け</button>
-                                <button id="home-btn-mix" class="home-care-btn">かき混ぜ</button>
-                                <button id="home-btn-add-nuka" class="home-care-btn">足しぬか</button>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 漬けている食材のリストエリア -->
-                    <section class="vegetable-section">
-                        <div class="section-header">
-                            <h2 class="section-title">漬けている食材</h2>
-                        </div>
-
-                        <!-- 正方形カード＋右上の丸バッジ形式で動的に挿入されます -->
-                        <div id="vegetable-list" class="vegetable-list"></div>
-                    </section>
-                </div>
-
-                <!-- 2. ぬか漬け履歴画面 -->
-                <div id="history-page" class="page-content hidden">
-                    <section class="card history-card-full">
-                        <div class="modal-header history-header-center mb-12">
-                            <h2 class="section-title text-center">ぬか漬け履歴・メモ</h2>
-                        </div>
-                        <p class="section-subtitle text-center mb-16">
-                            取り出した食材の漬け込み時間や味の感想を残せます。
-                        </p>
-                        <div id="veg-history-list" class="history-list">
-                            <!-- JSで取り出し履歴とメモを描画 -->
-                        </div>
-                    </section>
-                </div>
-
-                <!-- 3. カレンダー画面 -->
-                <div id="calendar-page" class="page-content hidden">
-                    <section class="card">
-                        <h2 class="section-title text-center mb-12">ぬか漬け・お手入れカレンダー</h2>
-
-                        <!-- 月間カレンダーエリア -->
-                        <div class="calendar-header">
-                            <button id="cal-prev" class="cal-nav-btn">‹</button>
-                            <span id="cal-month-title" class="cal-title">2026年 10月</span>
-                            <button id="cal-next" class="cal-nav-btn">›</button>
-                        </div>
-                        <div class="calendar-grid-header">
-                            <span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span>
-                        </div>
-                        <div id="calendar-grid" class="calendar-grid">
-                            <!-- JSで日付とアイコンを自動生成 -->
-                        </div>
-
-                        <!-- 選択した日の履歴詳細エリア -->
-                        <div class="selected-day-history">
-                            <h3 id="selected-date-text" class="selected-date-title">日時の履歴</h3>
-                            <div id="day-history-list" class="history-list">
-                                <!-- JSで選択日の履歴を表示 -->
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </main>
-
-            <!-- 下部固定ナビゲーションバー（3タブ） -->
-            <nav class="footer-nav">
-                <!-- 1. ホーム（おうちの線画アイコン） -->
-                <button class="nav-item active">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                    </span>
-                    <span class="nav-label">ホーム</span>
-                </button>
-
-                <!-- 2. ぬか漬け（ペンの線画アイコン） -->
-                <button class="nav-item">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 20h9"></path>
-                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                        </svg>
-                    </span>
-                    <span class="nav-label">ぬか漬け記録</span>
-                </button>
-
-                <!-- 3. カレンダー（カレンダーの線画アイコン） -->
-                <button class="nav-item">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                    </span>
-                    <span class="nav-label">カレンダー</span>
-                </button>
-            </nav>
-
-            <!-- ========================================== -->
-            <!-- モーダル（ポップアップ）群 -->
-            <!-- ========================================== -->
-
-            <!-- 食材追加モーダル -->
-            <div id="add-modal" class="modal-overlay hidden">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="modal-title" class="modal-title">
-                            <span id="modal-icon-container" class="modal-title-icon">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="10.5" y="2" width="3" height="2.5" rx="0.5"></rect>
-                                    <ellipse cx="12" cy="5.5" rx="6.5" ry="1.5"></ellipse>
-                                    <path
-                                        d="M5.5 8 C4.5 12 4.5 16 7.5 19 C9.5 21 14.5 21 16.5 19 C19.5 16 19.5 12 18.5 8 Z">
-                                    </path>
-                                </svg>
-                            </span>
-                            本漬けする食材を選ぶ
-                        </h3>
-                        <div class="modal-header-btns">
-                            <button id="btn-toggle-add-preset" class="icon-btn-trash" title="新規追加">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 20h9"></path>
-                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                                </svg>
-                            </button>
-
-                            <!-- ゴミ箱アイコン -->
-                            <button id="btn-toggle-edit-preset" class="icon-btn-trash" title="削除モード">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path
-                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                    </path>
-                                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                                </svg>
-                            </button>
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- 1. ホーム画面 -->
+            <div id="home-page" class="page-content">
+                <!-- ぬか床カード -->
+                <section class="card">
+                    <!-- ぬか床のタイトルと経過日数（上下改行） -->
+                    <div class="nuka-info">
+                        <h1 id="nuka-title" class="nuka-title">ぬかみ</h1>
+                        <div class="nuka-days-wrapper">
+                            <span id="nuka-days" class="nuka-days">34日目</span>
                         </div>
                     </div>
+                    <!-- ぬか床のイラスト（横長の台形SVG） -->
+                    <div class="container-wrapper">
+                        <button id="prev-btn" class="slide-btn">‹</button>
+                        <div class="illustration-box">
+                            <svg class="nuka-svg" viewBox="0 0 200 130" width="180" height="110">
+                                <!-- 容器のフタ（茶系） -->
+                                <rect x="12" y="22" width="176" height="10" rx="3" fill="#B08968" stroke="#7F5539"
+                                    stroke-width="1.5" />
+                                <!-- 容器本体 -->
+                                <polygon points="18,32 182,32 170,118 30,118" fill="#EAE0D5" stroke="#7F5539"
+                                    stroke-width="3.5" />
+                                <!-- ぬか床の中身 -->
+                                <path d="M 22 55 Q 60 50 100 55 T 178 55 L 167 114 Q 100 116 33 114 Z" fill="#DDB892" />
 
-                    <!-- プリセット並びエリア -->
-                    <div class="veg-presets" id="veg-presets"></div>
+                                <!-- ぬか床から少し顔をのぞかせる野菜たち -->
+                                <path d="M 40 62 Q 52 56 65 60" stroke="#558B2F" stroke-width="4.5"
+                                    stroke-linecap="round" fill="none" />
+                                <path d="M 140 60 Q 150 55 158 58" stroke="#E65100" stroke-width="4"
+                                    stroke-linecap="round" fill="none" />
 
-                    <!-- プリセット自由追加フォーム -->
-                    <div id="add-preset-form-box" class="add-preset-form hidden">
-                        <p id="preset-error-msg" class="preset-error-msg hidden"></p>
-                        <!-- 絵文字パレット -->
-                        <div id="emoji-picker" class="emoji-picker hidden">
-                            <span>🥒</span><span>🍆</span><span>🥬</span><span>🫜</span><span>🥕</span>
-                            <span>🍠</span><span>🫑</span><span>🥑</span><span>🍅</span><span>🫛</span>
-                            <span>🌿</span><span>🍄</span><span>🥦</span><span>🌽</span><span>🧅</span>
-                            <span>🧄</span><span>🥚</span><span>🧀</span><span>⬜</span><span>⬛</span>
-                            <span>🌶️</span><span>🫚</span><span>🌺</span><span>🪵</span><span>🍊</span>
-                            <span>🍎</span><span>🍵</span><span>🥓</span>
+                                <circle cx="85" cy="85" r="1.8" fill="#B08968" />
+                                <circle cx="115" cy="95" r="2.2" fill="#B08968" />
+                                <circle cx="70" cy="70" r="1.8" fill="#B08968" />
+                            </svg>
                         </div>
-                        <div class="input-row">
-                            <button type="button" id="btn-select-icon" class="icon-input-btn">🫑</button>
-                            <input type="hidden" id="new-veg-icon" value="🫑">
-                            <input type="text" id="new-veg-name" class="num-input name-input" placeholder="食材の名前">
-                            <button id="btn-add-preset" class="btn-add normal">追加</button>
-                        </div>
+                        <button id="next-btn" class="slide-btn">›</button>
+                    </div>
+                    <!-- ページネーション（ドット表示） -->
+                    <div class="dots">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
                     </div>
 
-                    <div class="modal-actions">
-                        <button id="close-add-modal" class="btn-cancel">閉じる</button>
+                    <!-- お手入れ記録エリア -->
+                    <div class="home-care-section">
+                        <div class="home-care-status">
+                            <span class="remind-time-title">最後のかき混ぜから：</span>
+                            <span id="last-mix-elapsed" class="remind-elapsed-home">0時間</span>
+                        </div>
+                        <div class="home-action-grid">
+                            <button id="add-normal-btn" class="btn-add normal">本漬け</button>
+                            <button id="add-sute-btn" class="btn-add sute">捨漬け</button>
+                            <button id="home-btn-mix" class="home-care-btn">かき混ぜ</button>
+                            <button id="home-btn-add-nuka" class="home-care-btn">足しぬか</button>
+                        </div>
                     </div>
-                </div>
+                </section>
+
+                <!-- 漬けている食材のリストエリア -->
+                <section class="vegetable-section">
+                    <div class="section-header">
+                        <h2 class="section-title">漬けている食材</h2>
+                    </div>
+                    <div id="vegetable-list" class="vegetable-list"></div>
+                </section>
             </div>
 
-            <!-- かき混ぜ確認用モーダル -->
-            <div id="mix-confirm-modal" class="modal-overlay hidden">
-                <div class="modal-content">
-                    <h3 class="modal-title">かき混ぜの確認</h3>
-                    <p class="remove-modal-text">ぬか床を天地返しで混ぜましたか？</p>
-                    <p class="remove-modal-text">常温で1日1回、冷蔵で2〜3日に1回です</p>
-                    <div class="modal-actions-group">
-                        <button id="mix-modal-cancel" class="btn-cancel">キャンセル</button>
-                        <button id="mix-modal-submit" class="btn-submit">混ぜた</button>
+            <!-- 2. ぬか漬け履歴画面 -->
+            <div id="history-page" class="page-content hidden">
+                <section class="card history-card-full">
+                    <div class="modal-header history-header-center mb-12">
+                        <h2 class="section-title text-center">ぬか漬け履歴・メモ</h2>
                     </div>
-                </div>
+                    <p class="section-subtitle text-center mb-16">
+                        取り出した食材の漬け込み時間や味の感想を残せます。
+                    </p>
+                    <div id="veg-history-list" class="history-list"></div>
+                </section>
             </div>
 
-            <!-- 足しぬか決定モーダル -->
-            <div id="care-modal" class="modal-overlay hidden">
-                <div class="modal-content">
-                    <h3 id="care-modal-title" class="modal-title">足しぬか</h3>
-                    <p class="remove-modal-text">1か月に1回お手入れしましょう</p>
-                    <div id="care-modal-body">
-                        <div class="input-group">
-                            <label class="input-label">
-                                ぬかの量 (0〜200g)
-                                <span><input type="number" id="input-nuka" class="num-input" min="0" max="200" step="1"
-                                        value="100"> g</span>
-                            </label>
-                            <label class="input-label">
-                                海塩の量 (0〜50g)
-                                <span><input type="number" id="input-salt" class="num-input" min="0" max="50" step="0.1"
-                                        value="8.0"> g</span>
-                            </label>
-                        </div>
+            <!-- 3. カレンダー画面 -->
+            <div id="calendar-page" class="page-content hidden">
+                <section class="card">
+                    <h2 class="section-title text-center mb-12">ぬか漬け・お手入れカレンダー</h2>
+
+                    <!-- 月間カレンダーエリア -->
+                    <div class="calendar-header">
+                        <button id="cal-prev" class="cal-nav-btn">‹</button>
+                        <span id="cal-month-title" class="cal-title">2026年 10月</span>
+                        <button id="cal-next" class="cal-nav-btn">›</button>
                     </div>
-                    <div class="modal-actions-group">
-                        <button id="care-modal-cancel" class="btn-cancel">キャンセル</button>
-                        <button id="care-modal-submit" class="btn-submit">記録する</button>
+                    <div class="calendar-grid-header">
+                        <span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span>
+                    </div>
+                    <div id="calendar-grid" class="calendar-grid"></div>
+
+                    <!-- 選択した日の履歴詳細エリア -->
+                    <div class="selected-day-history">
+                        <h3 id="selected-date-text" class="selected-date-title">日時の履歴</h3>
+                        <div id="day-history-list" class="history-list"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- 下部固定ナビゲーションバー（3タブ） -->
+        <nav class="footer-nav">
+            <button class="nav-item active">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </span>
+                <span class="nav-label">ホーム</span>
+            </button>
+            <button class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                </span>
+                <span class="nav-label">ぬか漬け記録</span>
+            </button>
+            <button class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </span>
+                <span class="nav-label">カレンダー</span>
+            </button>
+        </nav>
+
+        <!-- ========================================== -->
+        <!-- モーダル（ポップアップ）群 -->
+        <!-- ========================================== -->
+
+        <!-- 食材追加モーダル -->
+        <div id="add-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title" class="modal-title">
+                        <span id="modal-icon-container" class="modal-title-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="10.5" y="2" width="3" height="2.5" rx="0.5"></rect>
+                                <ellipse cx="12" cy="5.5" rx="6.5" ry="1.5"></ellipse>
+                                <path
+                                    d="M5.5 8 C4.5 12 4.5 16 7.5 19 C9.5 21 14.5 21 16.5 19 C19.5 16 19.5 12 18.5 8 Z">
+                                </path>
+                            </svg>
+                        </span>
+                        本漬けする食材を選ぶ
+                    </h3>
+                    <div class="modal-header-btns">
+                        <button id="btn-toggle-add-preset" class="icon-btn-trash" title="新規追加">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 20h9"></path>
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                            </svg>
+                        </button>
+                        <button id="btn-toggle-edit-preset" class="icon-btn-trash" title="削除モード">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- 食材取り出し確認モーダル -->
-            <div id="remove-modal" class="modal-overlay hidden">
-                <div class="modal-content">
-                    <h3 id="remove-modal-title" class="modal-title">取り出しの確認</h3>
-                    <p id="remove-modal-msg" class="remove-modal-text">「食材」を取り出しますか？</p>
-                    <div class="modal-actions-group">
-                        <button id="remove-modal-cancel" class="btn-cancel">キャンセル</button>
-                        <button id="remove-modal-submit" class="btn-submit">取り出す</button>
+                <div class="veg-presets" id="veg-presets"></div>
+
+                <div id="add-preset-form-box" class="add-preset-form hidden">
+                    <p id="preset-error-msg" class="preset-error-msg hidden"></p>
+                    <div id="emoji-picker" class="emoji-picker hidden">
+                        <span>🥒</span><span>🍆</span><span>🥬</span><span>🫜</span><span>🥕</span>
+                        <span>🍠</span><span>🫑</span><span>🥑</span><span>🍅</span><span>🫛</span>
+                        <span>🌿</span><span>🍄</span><span>🥦</span><span>🌽</span><span>🧅</span>
+                        <span>🧄</span><span>🥚</span><span>🧀</span><span>⬜</span><span>⬛</span>
+                        <span>🌶️</span><span>🫚</span><span>🌺</span><span>🪵</span><span>🍊</span>
+                        <span>🍎</span><span>🍵</span><span>🥓</span>
+                    </div>
+                    <div class="input-row">
+                        <button type="button" id="btn-select-icon" class="icon-input-btn">🫑</button>
+                        <input type="hidden" id="new-veg-icon" value="🫑">
+                        <input type="text" id="new-veg-name" class="num-input name-input" placeholder="食材の名前">
+                        <button id="btn-add-preset" class="btn-add normal">追加</button>
                     </div>
                 </div>
-            </div>
 
-            <!-- メモ入力用モーダル -->
-            <div id="memo-modal" class="modal-overlay hidden">
-                <div class="modal-content">
-                    <h3 id="memo-modal-title" class="modal-title">味の感想・メモ</h3>
-                    <textarea id="memo-input" class="memo-textarea" placeholder="漬け加減や塩味、次回試したいことなどを入力..."
-                        rows="4"></textarea>
-                    <div class="modal-actions-group">
-                        <button id="memo-modal-cancel" class="btn-cancel">キャンセル</button>
-                        <button id="memo-modal-submit" class="btn-submit">保存する</button>
-                    </div>
+                <div class="modal-actions">
+                    <button id="close-add-modal" class="btn-cancel full-btn">閉じる</button>
                 </div>
             </div>
         </div>
 
-        <!-- JavaScriptファイルの読み込み -->
-        <script src="script.js"></script>
+        <!-- かき混ぜ確認用モーダル -->
+        <div id="mix-confirm-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 class="modal-title">かき混ぜの確認</h3>
+                <p class="remove-modal-text">ぬか床を天地返しで混ぜましたか？</p>
+                <p class="remove-modal-text">常温で1日1回、冷蔵で2〜3日に1回です</p>
+                <div class="modal-actions-group">
+                    <button id="mix-modal-cancel" class="btn-cancel">キャンセル</button>
+                    <button id="mix-modal-submit" class="btn-submit">混ぜた</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 足しぬか決定モーダル -->
+        <div id="care-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 id="care-modal-title" class="modal-title">足しぬか</h3>
+                <p class="remove-modal-text">1か月に1回お手入れしましょう</p>
+                <div id="care-modal-body">
+                    <div class="input-group">
+                        <label class="input-label">
+                            ぬかの量 (0〜200g)
+                            <span><input type="number" id="input-nuka" class="num-input" min="0" max="200" step="1"
+                                    value="100"> g</span>
+                        </label>
+                        <label class="input-label">
+                            海塩の量 (0〜50g)
+                            <span><input type="number" id="input-salt" class="num-input" min="0" max="50" step="0.1"
+                                    value="8.0"> g</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-actions-group">
+                    <button id="care-modal-cancel" class="btn-cancel">キャンセル</button>
+                    <button id="care-modal-submit" class="btn-submit">記録する</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 食材取り出し確認モーダル -->
+        <div id="remove-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 id="remove-modal-title" class="modal-title">取り出しの確認</h3>
+                <p id="remove-modal-msg" class="remove-modal-text">「食材」を取り出しますか？</p>
+                <div class="modal-actions-group">
+                    <button id="remove-modal-cancel" class="btn-cancel">キャンセル</button>
+                    <button id="remove-modal-submit" class="btn-submit">取り出す</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- メモ入力用モーダル -->
+        <div id="memo-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 id="memo-modal-title" class="modal-title">味の感想・メモ</h3>
+                <textarea id="memo-input" class="memo-textarea" placeholder="漬け加減や塩味、次回試したいことなどを入力..."
+                    rows="4"></textarea>
+                <div class="modal-actions-group">
+                    <button id="memo-modal-cancel" class="btn-cancel">キャンセル</button>
+                    <button id="memo-modal-submit" class="btn-submit">保存する</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScriptファイルの読み込み -->
+    <script src="script.js"></script>
 </body>
 
 </html>
