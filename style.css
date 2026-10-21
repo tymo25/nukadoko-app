@@ -616,10 +616,9 @@ body {
 }
 
 .btn-icon-img {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
-    background: transparent;
 }
 
 .btn-add,
@@ -635,7 +634,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 2px;
     width: 100%;
     border: 1.5px solid #d9c4b0;
     outline: none;
@@ -645,19 +644,19 @@ body {
 }
 
 .btn-add.normal {
-    background-color: #6b584a;
+    background-color: #D6C29E;
     color: #ffffff;
     border-color: #554437;
 }
 
 .btn-add.sute {
-    background-color: #d9c4b0;
+    background-color: #D6C29E;
     color: #4a3b32;
     border-color: #a88d77;
 }
 
 .home-care-btn {
-    background-color: #d9c4b0;
+    background-color: #D6C29E;
     color: #6b584a;
 }
 

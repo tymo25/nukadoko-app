@@ -440,7 +440,7 @@ function executeRemoveVegetable() {
     }
 
     const isSuteText = veg.isSute ? '【捨漬け】' : '';
-    addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました${timeText}`);
+    addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました<br>${timeText}`);
 
     vegHistory.unshift({
         id: Date.now(),
@@ -748,8 +748,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // かき混ぜ確認モーダルの「混ぜた」ボタン
     document.getElementById('mix-modal-submit')?.addEventListener('click', () => {
-        lastMixTime = new Date();
-        addHistoryLog('👋🏼', 'ぬか床をかき混ぜました');
+        const now = new Date();
+        let elapsedText = '';
+
+        if (lastMixTime) {
+            const diffMs = now - new Date(lastMixTime);
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            elapsedText = `（前回から ${diffHours}時間）`;
+        }
+
+        // 時間を現在時刻に更新
+        lastMixTime = now;
+
+        // 履歴ログに経過時間を添えて保存
+        addHistoryLog('👋🏼', `ぬか床をかき混ぜました<br>${elapsedText}`);
+
         updateHomeCareDisplay();
         document.getElementById('mix-confirm-modal')?.classList.add('hidden');
     });
