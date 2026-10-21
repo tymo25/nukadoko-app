@@ -6,6 +6,7 @@ const nukaBeds = [
     {
         name: "ぬかみ",
         startDate: "2026-09-11",
+        lastMixTime: new Date(Date.now() - 17 * 60 * 60 * 1000), // 「ぬかみ」専用のかき混ぜ時間
         vegetables: [
             { name: "にんじん", icon: "🥕", startAt: new Date(Date.now() - 2 * 60 * 60 * 1000), isSute: false },
             { name: "かぶ", icon: "🫜", startAt: new Date(Date.now() - 16 * 60 * 60 * 1000), isSute: false },
@@ -15,6 +16,7 @@ const nukaBeds = [
     {
         name: "ぬか床2号",
         startDate: "2026-10-02",
+        lastMixTime: new Date(Date.now() - 5 * 60 * 60 * 1000), // 「ぬか床2号」専用のかき混ぜ時間
         vegetables: [
             { name: "きゅうり", icon: "🥒", startAt: new Date(Date.now() - 5 * 60 * 60 * 1000), isSute: false }
         ]
@@ -42,7 +44,6 @@ const defaultPresets = [
 let vegPresets = [];
 let vegHistory = [];
 let activityHistory = [];
-let lastMixTime = new Date(Date.now() - 17 * 60 * 60 * 1000);
 let isSuteMode = false;
 let pendingRemoveIndex = null;
 let currentMemoId = null;
@@ -60,18 +61,17 @@ function saveData() {
     localStorage.setItem('nukaBedsData', JSON.stringify(nukaBeds));
     localStorage.setItem('activityHistoryData', JSON.stringify(activityHistory));
     localStorage.setItem('vegHistoryData', JSON.stringify(vegHistory));
-    localStorage.setItem('lastMixTimeData', lastMixTime ? lastMixTime.toISOString() : '');
 }
 
 function loadData() {
     const savedBeds = localStorage.getItem('nukaBedsData');
     const savedHistory = localStorage.getItem('activityHistoryData');
     const savedVegHistory = localStorage.getItem('vegHistoryData');
-    const savedMixTime = localStorage.getItem('lastMixTimeData');
 
     if (savedBeds) {
         const parsed = JSON.parse(savedBeds);
         parsed.forEach(bed => {
+            if (bed.lastMixTime) bed.lastMixTime = new Date(bed.lastMixTime);
             if (bed.vegetables) {
                 bed.vegetables.forEach(veg => {
                     if (veg.startAt) veg.startAt = new Date(veg.startAt);
@@ -84,9 +84,6 @@ function loadData() {
 
     if (savedHistory) activityHistory = JSON.parse(savedHistory);
     if (savedVegHistory) vegHistory = JSON.parse(savedVegHistory);
-    if (savedMixTime) {
-        lastMixTime = new Date(savedMixTime);
-    }
 }
 
 function loadPresets() {
@@ -192,6 +189,7 @@ function updateNukaDisplay(index) {
     });
 
     renderVegetables();
+    updateHomeCareDisplay(); // ぬか床を切り替えたときにお手入れ時間も連動して更新
 }
 
 function renderVegetables() {
@@ -238,9 +236,11 @@ function updateHomeCareDisplay() {
     const elapsedEl = document.getElementById('last-mix-elapsed');
     if (!elapsedEl) return;
 
-    if (lastMixTime) {
+    const currentBed = nukaBeds[currentIndex];
+
+    if (currentBed && currentBed.lastMixTime) {
         const now = new Date();
-        const diffMs = now - new Date(lastMixTime);
+        const diffMs = now - new Date(currentBed.lastMixTime);
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
         elapsedEl.textContent = `${diffHours}時間`;
     } else {
@@ -433,21 +433,22 @@ function executeRemoveVegetable() {
         const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
         if (diffHours > 0) {
-            timeText = `（漬け時間: ${diffHours}時間${diffMins}分）`;
+            timeText = `漬け時間: ${diffHours}時間${diffMins}分`;
         } else {
-            timeText = `（漬け時間: ${diffMins}分）`;
+            timeText = `漬け時間: ${diffMins}分`;
         }
     }
 
     const isSuteText = veg.isSute ? '【捨漬け】' : '';
-    addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました<br>${timeText}`);
+    // 食材名と漬け時間を改行して履歴に保存
+    addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました<br>（${timeText}）`);
 
     vegHistory.unshift({
         id: Date.now(),
         name: veg.name,
         icon: veg.icon || '🥕',
         isSute: veg.isSute,
-        timeText: timeText.replace('（漬け時間: ', '').replace('）', ''),
+        timeText: timeText,
         dateStr: getFormattedDateTime().full,
         memo: ''
     });
@@ -746,24 +747,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('mix-confirm-modal')?.classList.remove('hidden');
     });
 
-    // かき混ぜ確認モーダルの「混ぜた」ボタン
+    // かき混ぜ確認モーダルの「混ぜた」ボタン（ぬか床ごとの名前と時間を記録）
     document.getElementById('mix-modal-submit')?.addEventListener('click', () => {
         const now = new Date();
+        const currentBed = nukaBeds[currentIndex]; // 今表示しているぬか床
         let elapsedText = '';
 
-        if (lastMixTime) {
-            const diffMs = now - new Date(lastMixTime);
+        if (currentBed.lastMixTime) {
+            const diffMs = now - new Date(currentBed.lastMixTime);
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
             elapsedText = `（前回から ${diffHours}時間）`;
         }
 
-        // 時間を現在時刻に更新
-        lastMixTime = now;
+        // 今選択しているぬか床の時間だけを現在時刻に更新
+        currentBed.lastMixTime = now;
 
-        // 履歴ログに経過時間を添えて保存
-        addHistoryLog('👋🏼', `ぬか床をかき混ぜました<br>${elapsedText}`);
+        // ぬか床の名前つきで、改行した履歴を保存
+        addHistoryLog('👋🏼', `【${currentBed.name}】をかき混ぜました<br>${elapsedText}`);
 
         updateHomeCareDisplay();
+        saveData();
         document.getElementById('mix-confirm-modal')?.classList.add('hidden');
     });
 
