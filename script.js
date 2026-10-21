@@ -776,7 +776,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 食材追加モーダル関連
     const potSvg = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="10.5" y="2" width="3" height="2.5" rx="0.5"></rect><ellipse cx="12" cy="5.5" rx="6.5" ry="1.5"></ellipse><path d="M5.5 8 C4.5 12 4.5 16 7.5 19 C9.5 21 14.5 21 16.5 19 C19.5 16 19.5 12 18.5 8 Z"></path></svg>`;
-    const handSvg = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14C4 11.5 6 9.5 8.5 9.5C9.5 9.5 10.5 9.8 11.2 10.4C13.2 8.5 16 8 18 9.5C19.5 10.8 19.8 13 18.8 14.8C18 16.2 16.8 17.5 15 19.5L14.2 20.2C13.8 20.6 13.2 20.8 12.6 20.8H10.5C9.2 20.8 8 20.2 7.2 19.2L5 16.5C4.4 15.8 4 14.9 4 14Z"></path><path d="M8.5 9.5C9.2 7.5 11 5.8 13.5 5.5C15.5 5.2 17.5 6.2 18.2 8"></path><path d="M11.2 10.4C12.2 11.2 13.5 13 13.8 15.5"></path></svg>`;
 
     document.getElementById('add-normal-btn')?.addEventListener('click', () => {
         isSuteMode = false;
@@ -793,7 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetAddModal();
         const modalTitle = document.getElementById('modal-title');
         if (modalTitle) {
-            modalTitle.innerHTML = `<span id="modal-icon-container" class="modal-title-icon">${handSvg}</span> 捨て漬けする食材を選ぶ`;
+            modalTitle.innerHTML = `捨て漬けする食材を選ぶ`;
         }
         document.getElementById('add-modal')?.classList.remove('hidden');
     });

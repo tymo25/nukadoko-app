@@ -205,12 +205,12 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .btn-add,
 .home-care-btn {
-    padding: 10px 2px;
+    padding: 5px 2px;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: bold;
@@ -234,7 +234,7 @@ body {
     box-shadow: 0 1px 3px rgba(127, 85, 57, 0.1);
 }
 
-.btn-add.normal {
+/*.btn-add.normal {
     background-color: #7f5539;
     color: #ffffff;
 }
@@ -242,7 +242,7 @@ body {
 .btn-add.sute {
     background-color: #d4b896;
     color: #4a3b32;
-}
+}*/
 
 #home-btn-mix {
     background-color: #fdfbf7;
@@ -616,15 +616,16 @@ body {
 }
 
 .btn-icon-img {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
+    background: transparent;
 }
 
 .btn-add,
 .home-care-btn {
-    padding: 8px 6px;
-    border-radius: 14px;
+    padding: 2px 0px;
+    border-radius: 26px;
     font-size: 0.7rem;
     font-weight: bold;
     cursor: pointer;
@@ -637,11 +638,27 @@ body {
     gap: 4px;
     width: 100%;
     border: 1.5px solid #d9c4b0;
-    /* 薄いブラウンの枠線を統一してボタンらしく */
     outline: none;
     box-shadow: 0 3px 8px rgba(127, 85, 57, 0.08);
     text-align: center;
     white-space: nowrap;
+}
+
+.btn-add.normal {
+    background-color: #6b584a;
+    color: #ffffff;
+    border-color: #554437;
+}
+
+.btn-add.sute {
+    background-color: #d9c4b0;
+    color: #4a3b32;
+    border-color: #a88d77;
+}
+
+.home-care-btn {
+    background-color: #d9c4b0;
+    color: #6b584a;
 }
 
 /* ==========================================
