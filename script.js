@@ -432,17 +432,19 @@ function executeRemoveVegetable() {
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
         const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
-        if (diffHours > 0) {
+        // ▼ 100時間以上のときは、分を切り捨てて時間だけにする
+        if (diffHours >= 100) {
+            timeText = `漬け時間: ${diffHours}時間`;
+        } else if (diffHours > 0) {
             timeText = `漬け時間: ${diffHours}時間${diffMins}分`;
         } else {
             timeText = `漬け時間: ${diffMins}分`;
         }
     }
-
-    const isSuteText = veg.isSute ? '【捨漬け】' : '';
-    // 食材名と漬け時間を改行して履歴に保存
-    addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました<br>（${timeText}）`);
-
+    const isSuteText = veg.isSute ? '[捨漬け]' : '';
+    const currentBedName = nukaBeds[currentIndex].name;
+    // ぬか床の名前を添えて、食材名と漬け時間を改行して履歴に保存
+    addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました<br>（${timeText}）「${currentBedName}」`);
     vegHistory.unshift({
         id: Date.now(),
         name: veg.name,
@@ -483,7 +485,7 @@ function renderVegHistory() {
                 <div class="veg-history-header">
                     <div class="veg-history-title">
                         <span>${item.icon}</span>
-                        <span>${item.isSute ? '【捨漬け】' : ''}${item.name}</span>
+                        <span>${item.isSute ? '[捨漬け]' : ''}${item.name}</span>
                     </div>
                     <div class="veg-history-right">
                         <span class="veg-history-time">${item.timeText ? '⏱ ' + item.timeText : ''}</span>
@@ -763,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBed.lastMixTime = now;
 
         // ぬか床の名前つきで、改行した履歴を保存
-        addHistoryLog('👋🏼', `【${currentBed.name}】をかき混ぜました<br>${elapsedText}`);
+        addHistoryLog('👋🏼', `「${currentBed.name}」をかき混ぜました<br>${elapsedText}`);
 
         updateHomeCareDisplay();
         saveData();

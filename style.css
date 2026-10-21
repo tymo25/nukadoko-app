@@ -95,7 +95,7 @@ body {
 }
 
 .section-title {
-    font-size: 1.0rem;
+    font-size: 0.9rem;
     color: #6b584a;
 }
 
@@ -214,6 +214,7 @@ body {
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: bold;
+    background-color: #fdfbf7;
     cursor: pointer;
     transition: all 0.15s ease;
     -webkit-tap-highlight-color: transparent;
@@ -232,28 +233,6 @@ body {
 .home-care-btn:active {
     transform: scale(0.95);
     box-shadow: 0 1px 3px rgba(127, 85, 57, 0.1);
-}
-
-/*.btn-add.normal {
-    background-color: #7f5539;
-    color: #ffffff;
-}
-
-.btn-add.sute {
-    background-color: #d4b896;
-    color: #4a3b32;
-}*/
-
-#home-btn-mix {
-    background-color: #fdfbf7;
-    color: #6b584a;
-    border: 1.5px solid #d9c4b0;
-}
-
-#home-btn-add-nuka {
-    background-color: #fdfbf7;
-    color: #6b584a;
-    border: 1.5px solid #d9c4b0;
 }
 
 .vegetable-section {
@@ -616,8 +595,8 @@ body {
 }
 
 .btn-icon-img {
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 36px;
     object-fit: contain;
 }
 
