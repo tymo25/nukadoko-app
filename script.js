@@ -28,17 +28,21 @@ let currentIndex = 0;
 const defaultPresets = [
     { name: 'きゅうり', icon: '🥒' },
     { name: 'なす', icon: '🍆' },
-    { name: 'だいこん', icon: '🥬' },
+    { name: 'だいこん', icon: '⚪️' },
     { name: 'かぶ', icon: '🫜' },
     { name: 'にんじん', icon: '🥕' },
     { name: 'キャベツ', icon: '🥬' },
+    { name: 'じゃがいも', icon: '🥔' },
     { name: '長芋', icon: '🍠' },
+    { name: 'さつまいも', icon: '🍠' },
     { name: 'パプリカ', icon: '🫑' },
     { name: 'アボカド', icon: '🥑' },
     { name: 'プチトマト', icon: '🍅' },
     { name: 'ゆで卵', icon: '🥚' },
     { name: 'オクラ', icon: '🫛' },
-    { name: 'チーズ', icon: '🧀' }
+    { name: 'りんご', icon: '🍎' },
+    { name: 'なし', icon: '🍐' },
+    { name: 'しいたけ', icon: '🍄' }
 ];
 
 let vegPresets = [];
@@ -340,6 +344,7 @@ function addVegetableFromPreset(name, icon) {
     saveData();
 
     document.getElementById('add-modal')?.classList.add('hidden');
+    document.body.classList.remove('modal-open');
 }
 
 function addNewPreset() {
@@ -510,6 +515,7 @@ function openMemoModal(id) {
 
     if (input) input.value = target.memo || '';
     if (modal) modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
 }
 
 function promptRemoveVegHistory(id) {
@@ -774,6 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ホーム画面のかき混ぜボタン（モーダルを開く）
     document.getElementById('home-btn-mix')?.addEventListener('click', () => {
         document.getElementById('mix-confirm-modal')?.classList.remove('hidden');
+        document.body.classList.remove('modal-open');
     });
 
     // かき混ぜ確認モーダルの「混ぜた」ボタン（ぬか床ごとの名前と時間を記録）
@@ -797,15 +804,18 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHomeCareDisplay();
         saveData();
         document.getElementById('mix-confirm-modal')?.classList.add('hidden');
+        document.body.classList.remove('modal-open');
     });
 
     document.getElementById('mix-modal-cancel')?.addEventListener('click', () => {
         document.getElementById('mix-confirm-modal')?.classList.add('hidden');
+        document.body.classList.remove('modal-open');
     });
 
     // ホーム画面のお手入れボタン（足しぬか）
     document.getElementById('home-btn-add-nuka')?.addEventListener('click', () => {
         document.getElementById('care-modal')?.classList.remove('hidden');
+        document.body.classList.remove('modal-open');
     });
 
     document.getElementById('care-modal-submit')?.addEventListener('click', () => {
@@ -813,10 +823,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const saltG = document.getElementById('input-salt')?.value || 8.0;
         addHistoryLog('🌾', `足しぬか（ぬか: ${nukaG}g / 塩: ${saltG}g）`);
         document.getElementById('care-modal')?.classList.add('hidden');
+        document.body.classList.add('modal-open');
     });
 
     document.getElementById('care-modal-cancel')?.addEventListener('click', () => {
         document.getElementById('care-modal')?.classList.add('hidden');
+        document.body.classList.add('modal-open');
     });
 
     // 食材追加モーダル関連
@@ -830,6 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modalTitle.innerHTML = `<span id="modal-icon-container" class="modal-title-icon">${potSvg}</span> 本漬けする食材を選ぶ`;
         }
         document.getElementById('add-modal')?.classList.remove('hidden');
+        document.body.classList.add('modal-open');
     });
 
     document.getElementById('add-sute-btn')?.addEventListener('click', () => {
@@ -840,10 +853,12 @@ document.addEventListener('DOMContentLoaded', () => {
             modalTitle.innerHTML = `捨て漬けする食材を選ぶ`;
         }
         document.getElementById('add-modal')?.classList.remove('hidden');
+        document.body.classList.add('modal-open');
     });
 
     document.getElementById('close-add-modal')?.addEventListener('click', () => {
         document.getElementById('add-modal')?.classList.add('hidden');
+        document.body.classList.add('modal-open');
     });
 
     document.getElementById('btn-add-preset')?.addEventListener('click', addNewPreset);
