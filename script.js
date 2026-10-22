@@ -112,6 +112,13 @@ function savePresets() {
 // ==========================================
 // 3. 日時・時間計算の共通関数
 // ==========================================
+// 半角の数字や記号を全角に変換する関数
+function toFullWidth(str) {
+    return String(str).replace(/[0-9:]/g, function (s) {
+        if (s === ':') return '：';
+        return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
+    });
+}
 
 function updateClock() {
     const now = new Date();
@@ -129,10 +136,10 @@ function updateClock() {
     const timeElement = document.getElementById('current-datetime-time');
 
     if (dateElement) {
-        dateElement.textContent = `${year}年${month}月${date}日(${day})`;
+        dateElement.textContent = toFullWidth(`${year}年${month}月${date}日(${day})`);
     }
     if (timeElement) {
-        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+        timeElement.textContent = toFullWidth(`${hours}:${minutes}:${seconds}`);
     }
 
     updateVegetableTimes();
