@@ -692,6 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
 
         window.addEventListener('touchmove', (e) => {
+            if (document.body.classList.contains('modal-open')) return;
             if (!isPulling) return;
             const touchY = e.touches[0].clientY;
             const diffY = touchY - touchStartY;
