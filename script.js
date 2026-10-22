@@ -267,7 +267,8 @@ function renderPresets() {
 
         wrapper.innerHTML = `
             <button class="preset-btn" data-name="${preset.name}" data-icon="${preset.icon}">
-                ${preset.icon} ${preset.name}
+                <span>${preset.icon}</span>
+                <span class="preset-text">${preset.name}</span>
             </button>
             <div class="preset-controls">
                 <button class="preset-del-btn" data-index="${index}" title="削除">×</button>
@@ -528,6 +529,25 @@ function promptRemoveVegHistory(id) {
     if (confirmModal) confirmModal.classList.remove('hidden');
 }
 
+let pendingRemoveActivityHistoryId = null; // カレンダー履歴削除用のIDを管理する変数
+
+function promptRemoveActivityHistory(id) {
+    const target = activityHistory.find(item => item.id === id);
+    if (!target) return;
+
+    pendingRemoveActivityHistoryId = id;
+
+    const confirmModal = document.getElementById('remove-modal');
+    const confirmTitle = document.getElementById('remove-modal-title');
+    const confirmText = document.getElementById('remove-modal-msg');
+    const confirmSubmitBtn = document.getElementById('remove-modal-submit');
+
+    if (confirmTitle) confirmTitle.textContent = "履歴の削除";
+    if (confirmText) confirmText.textContent = `この履歴を本当に削除しますか？`;
+    if (confirmSubmitBtn) confirmSubmitBtn.textContent = "削除";
+    if (confirmModal) confirmModal.classList.remove('hidden');
+}
+
 
 // ==========================================
 // 7. カレンダー & 履歴機能
@@ -633,14 +653,20 @@ function renderDayHistory(dateStr) {
     }
 
     container.innerHTML = logs.map(item => `
-        <div class="history-item">
-            <span class="history-icon">${item.icon}</span>
-            <div class="history-content">
-                <div class="history-text">${item.text}</div>
-                <div class="history-date">${item.fullDate}</div>
+       <div class="history-item-wrapper">
+            <div class="history-delete-action" onclick="promptRemoveActivityHistory(${item.id})">削除</div>
+            <div class="history-item history-card-content">
+                <span class="history-icon">${item.icon}</span>
+                <div class="history-content">
+                    <div class="history-text">${item.text}</div>
+                    <div class="history-date">${item.fullDate}</div>
+                </div>
             </div>
         </div>
     `).join('');
+
+    // ▼ カレンダーの履歴でもスライド操作が効くようにする
+    setupHistorySwipe();
 }
 
 
@@ -865,6 +891,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('remove-modal')?.classList.add('hidden');
             pendingRemoveVegHistoryId = null;
+        } else if (pendingRemoveActivityHistoryId !== null) {
+            activityHistory = activityHistory.filter(item => item.id !== pendingRemoveActivityHistoryId);
+            renderCalendar(); // カレンダーのアイコン表示も更新
+            renderDayHistory(selectedDateStr);
+            saveData();
+
+            document.getElementById('remove-modal')?.classList.add('hidden');
+            pendingRemoveActivityHistoryId = null;
         } else {
             executeRemoveVegetable();
         }

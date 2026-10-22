@@ -95,7 +95,7 @@ body {
 }
 
 .section-title {
-    font-size: 0.9rem;
+    font-size: 1.0rem;
     color: #6b584a;
 }
 
@@ -208,8 +208,7 @@ body {
     margin-top: 2px;
 }
 
-.btn-add,
-.home-care-btn {
+.btn-add {
     padding: 5px 2px;
     border-radius: 12px;
     font-size: 0.75rem;
@@ -229,10 +228,19 @@ body {
     white-space: nowrap;
 }
 
-.btn-add:active,
-.home-care-btn:active {
+.btn-add:active {
     transform: scale(0.95);
     box-shadow: 0 1px 3px rgba(127, 85, 57, 0.1);
+}
+
+.btn-add.normal {
+    background-color: #7f5539;
+    color: #ffffff;
+}
+
+.btn-add.sute {
+    background-color: #d4b896;
+    color: #4a3b32;
 }
 
 .vegetable-section {
@@ -595,8 +603,8 @@ body {
 }
 
 .btn-icon-img {
-    width: 50px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
 }
 
@@ -771,6 +779,7 @@ body {
 .preset-wrapper {
     position: relative;
     width: 100%;
+    min-width: 0;
     box-sizing: border-box;
     padding-top: 4px;
     padding-right: 6px;
@@ -783,6 +792,8 @@ body {
 
 .preset-btn {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
     background-color: #fdfbf7;
     border: 1.5px solid #f0e6d2;
     border-radius: 12px;
@@ -801,6 +812,19 @@ body {
 .preset-btn:active {
     background-color: #f7f1e5;
     transform: scale(0.97);
+}
+
+.preset-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    /* ★文字がしっかり縮んで「…」になるようにする設定 */
+}
+
+/* 絵文字アイコンが潰れたり文字を押しのけたりしないようにする設定 */
+.preset-btn span:first-child {
+    flex-shrink: 0;
 }
 
 .preset-controls {
@@ -873,8 +897,17 @@ body {
 #btn-add-preset {
     width: 64px;
     flex-shrink: 0;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 8px 4px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background-color: #7f5539;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(127, 85, 57, 0.15);
+    text-align: center;
+    white-space: nowrap;
 }
 
 .preset-error-msg {
