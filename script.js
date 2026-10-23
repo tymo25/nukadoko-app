@@ -112,13 +112,6 @@ function savePresets() {
 // ==========================================
 // 3. 日時・時間計算の共通関数
 // ==========================================
-// 半角の数字や記号を全角に変換する関数
-function toFullWidth(str) {
-    return String(str).replace(/[0-9:]/g, function (s) {
-        if (s === ':') return '：';
-        return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
-    });
-}
 
 function updateClock() {
     const now = new Date();
@@ -136,10 +129,10 @@ function updateClock() {
     const timeElement = document.getElementById('current-datetime-time');
 
     if (dateElement) {
-        dateElement.textContent = toFullWidth(`${year}年${month}月${date}日(${day})`);
+        dateElement.textContent = `${year}年${month}月${date}日(${day})`;
     }
     if (timeElement) {
-        timeElement.textContent = toFullWidth(`${hours}:${minutes}:${seconds}`);
+        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
     }
 
     updateVegetableTimes();
@@ -482,6 +475,14 @@ function executeRemoveVegetable() {
 // 6. ぬか漬け履歴タブ & メモモーダル
 // ==========================================
 
+// シンプルな時計（タイマー）用SVGアイコン
+const timerSvgIcon = `
+<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px; color: #8c7462;">
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 6 12 12 15.5 14"></polyline>
+</svg>
+`;
+
 function renderVegHistory() {
     const container = document.getElementById('veg-history-list');
     if (!container) return;
@@ -501,7 +502,7 @@ function renderVegHistory() {
                         <span>${item.isSute ? '[捨漬け]' : ''}${item.name}</span>
                     </div>
                     <div class="veg-history-right">
-                        <span class="veg-history-time">${item.timeText ? '⏱ ' + item.timeText : ''}</span>
+                        <span class="veg-history-time">${item.timeText ? timerSvgIcon + item.timeText : ''}</span>
                     </div>
                 </div>
                 <div class="veg-history-memo-box" onclick="openMemoModal(${item.id})">${item.memo ? item.memo : '<span class="no-memo">タップしてメモ・感想を入力...</span>'}</div>
@@ -645,6 +646,15 @@ function renderCalendar() {
     }
 }
 
+// シンプルなカレンダー用SVGアイコン
+const calendarSvgIcon = `
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: #8c7462;">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+    <line x1="16" y1="2" x2="16" y2="6"></line>
+    <line x1="8" y1="2" x2="8" y2="6"></line>
+    <line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+`;
 function renderDayHistory(dateStr) {
     const container = document.getElementById('day-history-list');
     const title = document.getElementById('selected-date-text');
@@ -658,7 +668,7 @@ function renderDayHistory(dateStr) {
 
     const displayDate = `${dateParts[0]}年${dateParts[1]}月${dateParts[2]}日(${dayName})`;
 
-    if (title) title.textContent = `📅 ${displayDate} の履歴`;
+    if (title) title.innerHTML = `${calendarSvgIcon} ${displayDate} の履歴`;
 
     if (logs.length === 0) {
         container.innerHTML = '<p style="font-size: 0.8rem; color: #8c7462; text-align: center; padding: 10px 0;">この日の記録はありません。</p>';
