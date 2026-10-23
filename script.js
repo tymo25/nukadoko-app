@@ -768,7 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diffY > 110) {
                 ptrElement.classList.add('refreshing');
                 ptrElement.style.transform = `translateY(50px)`;
-                ptrElement.querySelector('.pull-text').textContent = '更新中...';
+                ptrElement.querySelector('.pull-text').textContent = '更新中';
 
                 setTimeout(() => {
                     location.reload();
