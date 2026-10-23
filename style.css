@@ -17,6 +17,12 @@ body {
     color: #4a3b32;
 }
 
+/* モーダル表示時に後ろのスクロールを完全固定 */
+body.modal-open {
+    overflow: hidden !important;
+    touch-action: none !important;
+}
+
 .hidden {
     display: none !important;
 }
@@ -77,8 +83,8 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: auto;
-    gap: 16px;
+    overflow: hidden;
+    position: relative;
 }
 
 .page-content {
@@ -86,6 +92,9 @@ body {
     flex-direction: column;
     gap: 16px;
     width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .card {
@@ -318,7 +327,6 @@ body {
     padding: 0 2px;
 }
 
-/* ▼ 捨漬けの文字サイズを小さくする指定（ここで調整できます） */
 .veg-card-subtext {
     font-size: 0.55rem;
     color: #8c7462;
@@ -821,10 +829,8 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
-    /* ★文字がしっかり縮んで「…」になるようにする設定 */
 }
 
-/* 絵文字アイコンが潰れたり文字を押しのけたりしないようにする設定 */
 .preset-btn span:first-child {
     flex-shrink: 0;
 }
@@ -886,7 +892,6 @@ body {
     box-sizing: border-box;
 }
 
-/* ▼ 追加ボタンの幅を狭くし、食材名前スペースを完全にモーダル内に収める修正 */
 .add-preset-form .name-input {
     flex: 1;
     width: 0;
@@ -1060,7 +1065,7 @@ body {
     align-items: center;
     justify-content: center;
     flex-direction: row;
-    gap: 6px;
+    gap: 8px;
     background-color: #fdfbf7;
     color: #6b584a;
     font-size: 0.8rem;
@@ -1097,12 +1102,6 @@ body {
     }
 }
 
-/* ▼ モダルが開いているときに後ろの画面のスクロールや操作をロックする設定 */
-body.modal-open {
-    overflow: hidden;
-    touch-action: none;
-}
-
 /* ==========================================
     9. ぬか漬け履歴カードの左スライド削除スタイル
    ========================================== */
@@ -1113,6 +1112,7 @@ body.modal-open {
     border-radius: 12px;
     background-color: #7f5539;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .history-delete-action {

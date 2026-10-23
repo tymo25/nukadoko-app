@@ -6,7 +6,7 @@ const nukaBeds = [
     {
         name: "ぬかみ",
         startDate: "2026-09-11",
-        lastMixTime: new Date(Date.now() - 17 * 60 * 60 * 1000), // 「ぬかみ」専用のかき混ぜ時間
+        lastMixTime: new Date(Date.now() - 17 * 60 * 60 * 1000),
         vegetables: [
             { name: "にんじん", icon: "🥕", startAt: new Date(Date.now() - 2 * 60 * 60 * 1000), isSute: false },
             { name: "かぶ", icon: "🫜", startAt: new Date(Date.now() - 16 * 60 * 60 * 1000), isSute: false },
@@ -16,7 +16,7 @@ const nukaBeds = [
     {
         name: "ぬか床2号",
         startDate: "2026-10-02",
-        lastMixTime: new Date(Date.now() - 5 * 60 * 60 * 1000), // 「ぬか床2号」専用のかき混ぜ時間
+        lastMixTime: new Date(Date.now() - 5 * 60 * 60 * 1000),
         vegetables: [
             { name: "きゅうり", icon: "🥒", startAt: new Date(Date.now() - 5 * 60 * 60 * 1000), isSute: false }
         ]
@@ -55,6 +55,40 @@ let currentMemoId = null;
 let currentCalDate = new Date();
 let selectedDateStr = "";
 let pendingRemoveVegHistoryId = null;
+let pendingRemoveActivityHistoryId = null;
+
+
+// モーダルが開いているか共通チェックする関数
+function isAnyModalOpen() {
+    const modals = [
+        document.getElementById('add-modal'),
+        document.getElementById('mix-confirm-modal'),
+        document.getElementById('care-modal'),
+        document.getElementById('remove-modal'),
+        document.getElementById('memo-modal')
+    ];
+    return modals.some(modal => modal && !modal.classList.contains('hidden'));
+}
+
+// モーダルを開く共通処理（背景ロック付き）
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.classList.add('modal-open');
+    }
+}
+
+// モーダルを閉じる共通処理（背景ロック解除付き）
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    if (!isAnyModalOpen()) {
+        document.body.classList.remove('modal-open');
+    }
+}
 
 
 // ==========================================
@@ -193,7 +227,7 @@ function updateNukaDisplay(index) {
     });
 
     renderVegetables();
-    updateHomeCareDisplay(); // ぬか床を切り替えたときにお手入れ時間も連動して更新
+    updateHomeCareDisplay();
 }
 
 function renderVegetables() {
@@ -343,8 +377,7 @@ function addVegetableFromPreset(name, icon) {
     renderVegetables();
     saveData();
 
-    document.getElementById('add-modal')?.classList.add('hidden');
-    document.body.classList.remove('modal-open');
+    closeModal('add-modal');
 }
 
 function addNewPreset() {
@@ -413,13 +446,15 @@ function removeVegetable(index) {
 
     pendingRemoveIndex = index;
 
-    const confirmModal = document.getElementById('remove-modal');
+    const confirmTitle = document.getElementById('remove-modal-title');
     const confirmText = document.getElementById('remove-modal-msg');
     const confirmSubmitBtn = document.getElementById('remove-modal-submit');
 
+    if (confirmTitle) confirmTitle.textContent = "取り出しの確認";
     if (confirmText) confirmText.textContent = `「${veg.name}」を取り出しますか？`;
     if (confirmSubmitBtn) confirmSubmitBtn.textContent = "取り出す";
-    if (confirmModal) confirmModal.classList.remove('hidden');
+
+    openModal('remove-modal');
 }
 
 function executeRemoveVegetable() {
@@ -438,7 +473,6 @@ function executeRemoveVegetable() {
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
         const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
-        // ▼ 100時間以上のときは、分を切り捨てて時間だけにする
         if (diffHours >= 100) {
             timeText = `漬け時間: ${diffHours}時間`;
         } else if (diffHours > 0) {
@@ -449,7 +483,6 @@ function executeRemoveVegetable() {
     }
     const isSuteText = veg.isSute ? '[捨漬け]' : '';
     const currentBedName = nukaBeds[currentIndex].name;
-    // ぬか床の名前を添えて、食材名と漬け時間を改行して履歴に保存
     addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました<br>（${timeText}）「${currentBedName}」`);
     vegHistory.unshift({
         id: Date.now(),
@@ -466,7 +499,7 @@ function executeRemoveVegetable() {
     renderVegHistory();
     saveData();
 
-    document.getElementById('remove-modal')?.classList.add('hidden');
+    closeModal('remove-modal');
     pendingRemoveIndex = null;
 }
 
@@ -475,13 +508,8 @@ function executeRemoveVegetable() {
 // 6. ぬか漬け履歴タブ & メモモーダル
 // ==========================================
 
-// シンプルな時計（タイマー）用SVGアイコン
-const timerSvgIcon = `
-<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px; color: #8c7462;">
-    <circle cx="12" cy="12" r="9"></circle>
-    <polyline points="12 6 12 12 15.5 14"></polyline>
-</svg>
-`;
+// サイズ・表示崩れを完全に防ぐ安全なインラインSVGタイマーアイコン
+const timerSvgIcon = `<svg viewBox="0 0 24 24" width="13" height="13" style="display:inline-block;vertical-align:middle;margin-right:3px;stroke:#8c7462;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 15.5 14"></polyline></svg>`;
 
 function renderVegHistory() {
     const container = document.getElementById('veg-history-list');
@@ -518,12 +546,10 @@ function openMemoModal(id) {
     if (!target) return;
 
     currentMemoId = id;
-    const modal = document.getElementById('memo-modal');
     const input = document.getElementById('memo-input');
 
     if (input) input.value = target.memo || '';
-    if (modal) modal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
+    openModal('memo-modal');
 }
 
 function promptRemoveVegHistory(id) {
@@ -532,7 +558,6 @@ function promptRemoveVegHistory(id) {
 
     pendingRemoveVegHistoryId = id;
 
-    const confirmModal = document.getElementById('remove-modal');
     const confirmTitle = document.getElementById('remove-modal-title');
     const confirmText = document.getElementById('remove-modal-msg');
     const confirmSubmitBtn = document.getElementById('remove-modal-submit');
@@ -540,10 +565,9 @@ function promptRemoveVegHistory(id) {
     if (confirmTitle) confirmTitle.textContent = "履歴の削除";
     if (confirmText) confirmText.textContent = `「${target.name}」の履歴を本当に削除しますか？`;
     if (confirmSubmitBtn) confirmSubmitBtn.textContent = "削除";
-    if (confirmModal) confirmModal.classList.remove('hidden');
-}
 
-let pendingRemoveActivityHistoryId = null; // カレンダー履歴削除用のIDを管理する変数
+    openModal('remove-modal');
+}
 
 function promptRemoveActivityHistory(id) {
     const target = activityHistory.find(item => item.id === id);
@@ -551,7 +575,6 @@ function promptRemoveActivityHistory(id) {
 
     pendingRemoveActivityHistoryId = id;
 
-    const confirmModal = document.getElementById('remove-modal');
     const confirmTitle = document.getElementById('remove-modal-title');
     const confirmText = document.getElementById('remove-modal-msg');
     const confirmSubmitBtn = document.getElementById('remove-modal-submit');
@@ -559,7 +582,8 @@ function promptRemoveActivityHistory(id) {
     if (confirmTitle) confirmTitle.textContent = "履歴の削除";
     if (confirmText) confirmText.textContent = `この履歴を本当に削除しますか？`;
     if (confirmSubmitBtn) confirmSubmitBtn.textContent = "削除";
-    if (confirmModal) confirmModal.classList.remove('hidden');
+
+    openModal('remove-modal');
 }
 
 
@@ -646,7 +670,6 @@ function renderCalendar() {
     }
 }
 
-// シンプルなカレンダー用SVGアイコン
 const calendarSvgIcon = `
 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: #8c7462;">
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -655,6 +678,7 @@ const calendarSvgIcon = `
     <line x1="3" y1="10" x2="21" y2="10"></line>
 </svg>
 `;
+
 function renderDayHistory(dateStr) {
     const container = document.getElementById('day-history-list');
     const title = document.getElementById('selected-date-text');
@@ -688,7 +712,6 @@ function renderDayHistory(dateStr) {
         </div>
     `).join('');
 
-    // ▼ カレンダーの履歴でもスライド操作が効くようにする
     setupHistorySwipe();
 }
 
@@ -698,18 +721,18 @@ function renderDayHistory(dateStr) {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 引っ張って更新
     let touchStartY = 0;
     let isPulling = false;
     const ptrElement = document.getElementById('pull-to-refresh');
-    const mainContainer = document.querySelector('.main-content');
 
-    if (ptrElement && mainContainer) {
+    if (ptrElement) {
         window.addEventListener('touchstart', (e) => {
-            // ▼ モーダルが開いているときは引っ張りを完全ブロック
-            if (document.body.classList.contains('modal-open')) return;
+            if (isAnyModalOpen()) return;
 
-            if (mainContainer.scrollTop === 0) {
+            const activePage = document.querySelector('.page-content:not(.hidden)');
+            const scrollTop = activePage ? activePage.scrollTop : 0;
+
+            if (scrollTop <= 0) {
                 touchStartY = e.touches[0].clientY;
                 isPulling = true;
             } else {
@@ -718,14 +741,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
 
         window.addEventListener('touchmove', (e) => {
-            // ▼ モーダルが開いているときは引っ張りを完全ブロック
-            if (document.body.classList.contains('modal-open')) return;
+            if (isAnyModalOpen() || !isPulling) return;
 
-            if (!isPulling) return;
             const touchY = e.touches[0].clientY;
             const diffY = touchY - touchStartY;
 
-            if (diffY > 0 && mainContainer.scrollTop === 0) {
+            if (diffY > 0) {
                 const pullDistance = Math.min(diffY * 0.4, 60);
                 ptrElement.style.transform = `translateY(${pullDistance}px)`;
 
@@ -738,16 +759,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
 
         window.addEventListener('touchend', (e) => {
-            // ▼ モーダルが開いているときは引っ張りを完全ブロック
-            if (document.body.classList.contains('modal-open')) return;
-
-            if (!isPulling) return;
+            if (isAnyModalOpen() || !isPulling) return;
             isPulling = false;
 
             const touchEndY = e.changedTouches[0].clientY;
             const diffY = touchEndY - touchStartY;
 
-            if (diffY > 110 && mainContainer.scrollTop === 0) {
+            if (diffY > 110) {
                 ptrElement.classList.add('refreshing');
                 ptrElement.style.transform = `translateY(50px)`;
                 ptrElement.querySelector('.pull-text').textContent = '更新中...';
@@ -773,7 +791,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderVegHistory();
     updateHomeCareDisplay();
 
-    // 3タブ構成のナビゲーション切り替え
     const navItems = document.querySelectorAll('.nav-item');
     const pages = [
         document.getElementById('home-page'),
@@ -788,10 +805,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             pages.forEach(page => page?.classList.add('hidden'));
             if (pages[index]) pages[index].classList.remove('hidden');
+
+            localStorage.setItem('activeTabIndex', index);
         });
     });
 
-    // ぬか床スライド切替
+    const savedTabIndex = localStorage.getItem('activeTabIndex');
+    if (savedTabIndex !== null && navItems[savedTabIndex]) {
+        navItems[savedTabIndex].click();
+    }
+
     document.getElementById('prev-btn')?.addEventListener('click', () => {
         currentIndex = (currentIndex - 1 + nukaBeds.length) % nukaBeds.length;
         updateNukaDisplay(currentIndex);
@@ -802,16 +825,13 @@ document.addEventListener('DOMContentLoaded', () => {
         updateNukaDisplay(currentIndex);
     });
 
-    // ホーム画面のかき混ぜボタン（モーダルを開く）
     document.getElementById('home-btn-mix')?.addEventListener('click', () => {
-        document.getElementById('mix-confirm-modal')?.classList.remove('hidden');
-        document.body.classList.remove('modal-open');
+        openModal('mix-confirm-modal');
     });
 
-    // かき混ぜ確認モーダルの「混ぜた」ボタン（ぬか床ごとの名前と時間を記録）
     document.getElementById('mix-modal-submit')?.addEventListener('click', () => {
         const now = new Date();
-        const currentBed = nukaBeds[currentIndex]; // 今表示しているぬか床
+        const currentBed = nukaBeds[currentIndex];
         let elapsedText = '';
 
         if (currentBed.lastMixTime) {
@@ -820,43 +840,34 @@ document.addEventListener('DOMContentLoaded', () => {
             elapsedText = `（前回から ${diffHours}時間）`;
         }
 
-        // 今選択しているぬか床の時間だけを現在時刻に更新
         currentBed.lastMixTime = now;
-
-        // ぬか床の名前つきで、改行した履歴を保存
         addHistoryLog('👋🏼', `「${currentBed.name}」をかき混ぜました<br>${elapsedText}`);
 
         updateHomeCareDisplay();
         saveData();
-        document.getElementById('mix-confirm-modal')?.classList.add('hidden');
-        document.body.classList.remove('modal-open');
+        closeModal('mix-confirm-modal');
     });
 
     document.getElementById('mix-modal-cancel')?.addEventListener('click', () => {
-        document.getElementById('mix-confirm-modal')?.classList.add('hidden');
-        document.body.classList.remove('modal-open');
+        closeModal('mix-confirm-modal');
     });
 
-    // ホーム画面のお手入れボタン（足しぬか）
     document.getElementById('home-btn-add-nuka')?.addEventListener('click', () => {
-        document.getElementById('care-modal')?.classList.remove('hidden');
-        document.body.classList.remove('modal-open');
+        openModal('care-modal');
     });
 
     document.getElementById('care-modal-submit')?.addEventListener('click', () => {
         const nukaG = document.getElementById('input-nuka')?.value || 100;
         const saltG = document.getElementById('input-salt')?.value || 8.0;
         addHistoryLog('🌾', `足しぬか（ぬか: ${nukaG}g / 塩: ${saltG}g）`);
-        document.getElementById('care-modal')?.classList.add('hidden');
-        document.body.classList.add('modal-open');
+        saveData();
+        closeModal('care-modal');
     });
 
     document.getElementById('care-modal-cancel')?.addEventListener('click', () => {
-        document.getElementById('care-modal')?.classList.add('hidden');
-        document.body.classList.add('modal-open');
+        closeModal('care-modal');
     });
 
-    // 食材追加モーダル関連
     const potSvg = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="10.5" y="2" width="3" height="2.5" rx="0.5"></rect><ellipse cx="12" cy="5.5" rx="6.5" ry="1.5"></ellipse><path d="M5.5 8 C4.5 12 4.5 16 7.5 19 C9.5 21 14.5 21 16.5 19 C19.5 16 19.5 12 18.5 8 Z"></path></svg>`;
 
     document.getElementById('add-normal-btn')?.addEventListener('click', () => {
@@ -866,8 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modalTitle) {
             modalTitle.innerHTML = `<span id="modal-icon-container" class="modal-title-icon">${potSvg}</span> 本漬けする食材を選ぶ`;
         }
-        document.getElementById('add-modal')?.classList.remove('hidden');
-        document.body.classList.add('modal-open');
+        openModal('add-modal');
     });
 
     document.getElementById('add-sute-btn')?.addEventListener('click', () => {
@@ -877,13 +887,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modalTitle) {
             modalTitle.innerHTML = `捨て漬けする食材を選ぶ`;
         }
-        document.getElementById('add-modal')?.classList.remove('hidden');
-        document.body.classList.add('modal-open');
+        openModal('add-modal');
     });
 
     document.getElementById('close-add-modal')?.addEventListener('click', () => {
-        document.getElementById('add-modal')?.classList.add('hidden');
-        document.body.classList.add('modal-open');
+        closeModal('add-modal');
     });
 
     document.getElementById('btn-add-preset')?.addEventListener('click', addNewPreset);
@@ -921,34 +929,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 履歴削除と食材取り出しの分岐
     const removeSubmitBtn = document.getElementById('remove-modal-submit');
-    removeSubmitBtn.replaceWith(removeSubmitBtn.cloneNode(true));
-    document.getElementById('remove-modal-submit')?.addEventListener('click', () => {
-        if (pendingRemoveVegHistoryId !== null) {
-            vegHistory = vegHistory.filter(item => item.id !== pendingRemoveVegHistoryId);
-            renderVegHistory();
-            saveData();
-
-            document.getElementById('remove-modal')?.classList.add('hidden');
-            pendingRemoveVegHistoryId = null;
-        } else if (pendingRemoveActivityHistoryId !== null) {
-            activityHistory = activityHistory.filter(item => item.id !== pendingRemoveActivityHistoryId);
-            renderCalendar(); // カレンダーのアイコン表示も更新
-            renderDayHistory(selectedDateStr);
-            saveData();
-
-            document.getElementById('remove-modal')?.classList.add('hidden');
-            pendingRemoveActivityHistoryId = null;
-        } else {
-            executeRemoveVegetable();
-        }
-    });
+    if (removeSubmitBtn) {
+        removeSubmitBtn.replaceWith(removeSubmitBtn.cloneNode(true));
+        document.getElementById('remove-modal-submit')?.addEventListener('click', () => {
+            if (pendingRemoveVegHistoryId !== null) {
+                vegHistory = vegHistory.filter(item => item.id !== pendingRemoveVegHistoryId);
+                renderVegHistory();
+                saveData();
+                closeModal('remove-modal');
+                pendingRemoveVegHistoryId = null;
+            } else if (pendingRemoveActivityHistoryId !== null) {
+                activityHistory = activityHistory.filter(item => item.id !== pendingRemoveActivityHistoryId);
+                renderCalendar();
+                renderDayHistory(selectedDateStr);
+                saveData();
+                closeModal('remove-modal');
+                pendingRemoveActivityHistoryId = null;
+            } else {
+                executeRemoveVegetable();
+            }
+        });
+    }
 
     document.getElementById('remove-modal-cancel')?.addEventListener('click', () => {
-        document.getElementById('remove-modal')?.classList.add('hidden');
+        closeModal('remove-modal');
         pendingRemoveIndex = null;
         pendingRemoveVegHistoryId = null;
+        pendingRemoveActivityHistoryId = null;
     });
 
     document.getElementById('cal-prev')?.addEventListener('click', () => {
@@ -972,26 +980,23 @@ document.addEventListener('DOMContentLoaded', () => {
             renderVegHistory();
         }
 
-        document.getElementById('memo-modal')?.classList.add('hidden');
+        closeModal('memo-modal');
         currentMemoId = null;
     });
 
     document.getElementById('memo-modal-cancel')?.addEventListener('click', () => {
-        document.getElementById('memo-modal')?.classList.add('hidden');
+        closeModal('memo-modal');
         currentMemoId = null;
     });
 
-    // CSVエクスポート機能
     function exportVegHistoryToCSV() {
         if (!vegHistory || vegHistory.length === 0) {
             alert("書き出す履歴データがまだありません。");
             return;
         }
 
-        // CSVのヘッダー行
         let csvContent = "\uFEFF" + "ID,食材名,アイコン,区分(捨漬け),漬け時間,取り出し日時,メモ・感想\n";
 
-        // データの各行を作成
         vegHistory.forEach(item => {
             const id = item.id;
             const name = `"${(item.name || "").replace(/"/g, '""')}"`;
@@ -1004,12 +1009,10 @@ document.addEventListener('DOMContentLoaded', () => {
             csvContent += `${id},${name},${icon},${isSute},${timeText},${dateStr},${memo}\n`;
         });
 
-        // Blobを作成してダウンロードリンクを生成
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
 
-        // ファイル名の設定（現在日付を入れる）
         const now = new Date();
         const y = now.getFullYear();
         const m = String(now.getMonth() + 1).padStart(2, '0');
@@ -1021,13 +1024,14 @@ document.addEventListener('DOMContentLoaded', () => {
         link.click();
         document.body.removeChild(link);
     }
-    // CSV書き出しボタンのイベント
+
     document.getElementById('export-csv-btn')?.addEventListener('click', exportVegHistoryToCSV);
 });
 
 // ==========================================
-// 9. ぬか漬け履歴カードの左スライド操作用関数
+// 9. 左スライド削除操作用関数
 // ==========================================
+
 function setupHistorySwipe() {
     const wrappers = document.querySelectorAll('.history-item-wrapper');
 
