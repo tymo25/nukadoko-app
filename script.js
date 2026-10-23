@@ -706,6 +706,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (ptrElement && mainContainer) {
         window.addEventListener('touchstart', (e) => {
+            // ▼ モーダルが開いているときは引っ張りを完全ブロック
+            if (document.body.classList.contains('modal-open')) return;
+
             if (mainContainer.scrollTop === 0) {
                 touchStartY = e.touches[0].clientY;
                 isPulling = true;
@@ -715,7 +718,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
 
         window.addEventListener('touchmove', (e) => {
+            // ▼ モーダルが開いているときは引っ張りを完全ブロック
             if (document.body.classList.contains('modal-open')) return;
+
             if (!isPulling) return;
             const touchY = e.touches[0].clientY;
             const diffY = touchY - touchStartY;
@@ -733,6 +738,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
 
         window.addEventListener('touchend', (e) => {
+            // ▼ モーダルが開いているときは引っ張りを完全ブロック
+            if (document.body.classList.contains('modal-open')) return;
+
             if (!isPulling) return;
             isPulling = false;
 

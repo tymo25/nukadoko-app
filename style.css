@@ -1059,6 +1059,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: row;
     gap: 6px;
     background-color: #fdfbf7;
     color: #6b584a;
@@ -1070,8 +1071,16 @@ body {
 
 .pull-spinner {
     font-size: 1.2rem;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
     transition: transform 0.3s ease;
+}
+
+.pull-text {
+    display: inline-block;
+    line-height: 1;
 }
 
 .pull-to-refresh.refreshing .pull-spinner {
