@@ -386,7 +386,7 @@ function addNewPreset() {
     const iconBtn = document.getElementById('btn-select-icon');
     const errorMsg = document.getElementById('preset-error-msg');
 
-    const icon = iconInput ? iconInput.value || '🫑' : '🫑';
+    const icon = iconInput ? iconInput.value || '🥒' : '🥒';
     const name = nameInput ? nameInput.value.trim() : '';
 
     if (!name) {
@@ -405,8 +405,8 @@ function addNewPreset() {
     renderPresets();
 
     if (nameInput) nameInput.value = '';
-    if (iconInput) iconInput.value = '🫑';
-    if (iconBtn) iconBtn.textContent = '🫑';
+    if (iconInput) iconInput.value = '🥒';
+    if (iconBtn) iconBtn.textContent = '🥒';
 
     document.getElementById('emoji-picker')?.classList.add('hidden');
 }
@@ -435,8 +435,8 @@ function resetAddModal() {
 
     if (errorMsg) errorMsg.classList.add('hidden');
     if (nameInput) nameInput.value = '';
-    if (iconInput) iconInput.value = '🫑';
-    if (iconBtn) iconBtn.textContent = '🫑';
+    if (iconInput) iconInput.value = '🥒';
+    if (iconBtn) iconBtn.textContent = '🥒';
     if (emojiPicker) emojiPicker.classList.add('hidden');
 }
 
@@ -483,7 +483,7 @@ function executeRemoveVegetable() {
     }
     const isSuteText = veg.isSute ? '[捨漬け]' : '';
     const currentBedName = nukaBeds[currentIndex].name;
-    addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出しました<br>（${timeText}）「${currentBedName}」`);
+    addHistoryLog(veg.icon || '🥕', `${isSuteText}${veg.name}を取り出し「${currentBedName}」<br>（${timeText}）`);
     vegHistory.unshift({
         id: Date.now(),
         name: veg.name,
@@ -642,7 +642,7 @@ function renderCalendar() {
         const dayLogs = activityHistory.filter(item => item.dateOnly === dateStr);
 
         const uniqueIcons = [];
-        const hasRemove = dayLogs.some(l => l.text.includes('取り出しました') || l.icon === '🥕');
+        const hasRemove = dayLogs.some(l => l.text.includes('取り出し') || l.icon === '🥕');
         const hasMix = dayLogs.some(l => l.icon === '👋🏼' || l.text.includes('かき混ぜ'));
         const hasAddNuka = dayLogs.some(l => l.icon === '🌾' || l.text.includes('足しぬか'));
         const hasWater = dayLogs.some(l => l.icon === '🚰' || l.text.includes('水抜き'));
@@ -841,7 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         currentBed.lastMixTime = now;
-        addHistoryLog('👋🏼', `「${currentBed.name}」をかき混ぜました<br>${elapsedText}`);
+        addHistoryLog('👋🏼', `かき混ぜ「${currentBed.name}」${elapsedText}`);
 
         updateHomeCareDisplay();
         saveData();
@@ -859,7 +859,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('care-modal-submit')?.addEventListener('click', () => {
         const nukaG = document.getElementById('input-nuka')?.value || 100;
         const saltG = document.getElementById('input-salt')?.value || 8.0;
-        addHistoryLog('🌾', `足しぬか（ぬか: ${nukaG}g / 塩: ${saltG}g）`);
+        const currentBedName = nukaBeds[currentIndex].name;
+        addHistoryLog('🌾', `足しぬか「${currentBedName}」<br>（ぬか: ${nukaG}g/ 塩: ${saltG}g）`);
         saveData();
         closeModal('care-modal');
     });
