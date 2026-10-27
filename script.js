@@ -839,46 +839,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ぬか床イラスト部分の左右スワイプ切り替え
-    const containerWrapper = document.querySelector('.container-wrapper');
-    const illustrationBox = document.querySelector('.illustration-box');
+    // ==========================================
+    // ぬか床エリア全体の指追従スワイプ切り替え
+    // ==========================================
+    const homePage = document.getElementById('home-page');
+    // ホーム画面のカード全体をスワイプ対象にする
+    const targetCard = homePage ? homePage.querySelector('.card') : null;
 
-    if (containerWrapper && illustrationBox) {
+    if (homePage && targetCard) {
         let touchStartX = 0;
         let currentX = 0;
         let isSwiping = false;
 
-        containerWrapper.addEventListener('touchstart', (e) => {
+        targetCard.addEventListener('touchstart', (e) => {
+            // カレンダーやボタン、入力欄などのインタラクティブな要素でなければスワイプを開始
+            if (e.target.closest('button') || e.target.closest('.vegetable-list')) {
+                return;
+            }
             touchStartX = e.touches[0].clientX;
             isSwiping = true;
-            illustrationBox.style.transition = 'none'; // 動かしている最中はアニメーションを切り、指に完全に追従させる
+            targetCard.style.transition = 'none'; // 指に完全追従させるためアニメーションをオフ
         }, { passive: true });
 
-        containerWrapper.addEventListener('touchmove', (e) => {
+        targetCard.addEventListener('touchmove', (e) => {
             if (!isSwiping) return;
             currentX = e.touches[0].clientX;
             const diffX = currentX - touchStartX;
 
-            // 指の動きに合わせてイラストボックスを左右にリアルタイムで動かす
-            illustrationBox.style.transform = `translateX(${diffX}px)`;
+            // カード全体を指の動きに合わせて左右に動かす
+            targetCard.style.transform = `translateX(${diffX}px)`;
         }, { passive: true });
 
-        containerWrapper.addEventListener('touchend', (e) => {
+        targetCard.addEventListener('touchend', (e) => {
             if (!isSwiping) return;
             isSwiping = false;
 
             const touchEndX = e.changedTouches[0].clientX;
             const diffX = touchEndX - touchStartX;
 
-            // 指を離した後の動きにスムーズなアニメーションを設定
-            illustrationBox.style.transition = 'transform 0.25s ease';
+            targetCard.style.transition = 'transform 0.25s ease';
 
-            if (Math.abs(diffX) > 60) {
-                // 一定以上（60px以上）スワイプしていた場合：画面の端へシュッと飛ばす
-                const flyOutX = diffX > 0 ? 300 : -300;
-                illustrationBox.style.transform = `translateX(${flyOutX}px)`;
+            if (Math.abs(diffX) > 70) {
+                // 一定以上スワイプされた場合：カードを画面の外へシュッと飛ばす
+                const flyOutX = diffX > 0 ? 350 : -350;
+                targetCard.style.transform = `translateX(${flyOutX}px)`;
 
                 setTimeout(() => {
-                    // ぬか床の番号を切り替え
+                    // ぬか床の切り替え
                     if (diffX > 0) {
                         currentIndex = (currentIndex - 1 + nukaBeds.length) % nukaBeds.length;
                     } else {
@@ -886,18 +893,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     updateNukaDisplay(currentIndex);
 
-                    // 次のぬか床のイラストを反対側の端に瞬間移動させ、スッと中央に戻す
-                    illustrationBox.style.transition = 'none';
-                    illustrationBox.style.transform = diffX > 0 ? 'translateX(-300px)' : 'translateX(300px)';
+                    // 次のぬか床のカードを反対側からスッと登場させる
+                    targetCard.style.transition = 'none';
+                    targetCard.style.transform = diffX > 0 ? 'translateX(-350px)' : 'translateX(350px)';
 
                     setTimeout(() => {
-                        illustrationBox.style.transition = 'transform 0.25s ease';
-                        illustrationBox.style.transform = 'translateX(0px)';
+                        targetCard.style.transition = 'transform 0.25s ease';
+                        targetCard.style.transform = 'translateX(0px)';
                     }, 20);
                 }, 200);
             } else {
-                // スワイプが足りない場合：元の位置にスルスルと戻す
-                illustrationBox.style.transform = `translateX(0px)`;
+                // スワイプが足りない場合は元の位置に戻す
+                targetCard.style.transform = `translateX(0px)`;
             }
         });
     }
