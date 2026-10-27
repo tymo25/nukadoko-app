@@ -491,7 +491,8 @@ function executeRemoveVegetable() {
         isSute: veg.isSute,
         timeText: timeText,
         dateStr: getFormattedDateTime().full,
-        memo: ''
+        memo: '',
+        bedName: currentBedName
     });
 
     nukaBeds[currentIndex].vegetables.splice(pendingRemoveIndex, 1);
@@ -508,7 +509,7 @@ function executeRemoveVegetable() {
 // 6. ぬか漬け履歴タブ & メモモーダル
 // ==========================================
 
-// サイズ・表示崩れを完全に防ぐ安全なインラインSVGタイマーアイコン
+// SVGタイマーアイコン
 const timerSvgIcon = `<svg viewBox="0 0 24 24" width="13" height="13" style="display:inline-block;vertical-align:middle;margin-right:3px;stroke:#8c7462;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 15.5 14"></polyline></svg>`;
 
 function renderVegHistory() {
@@ -516,18 +517,28 @@ function renderVegHistory() {
     if (!container) return;
 
     if (vegHistory.length === 0) {
-        container.innerHTML = '<p style="font-size: 0.8rem; color: #8c7462; text-align: center; padding: 15px 0;">まだ取り出した食材はありません。</p>';
+        container.innerHTML = '<p style="font-size: 0.8rem; color: #8c7462; text-align: center; padding: 15px 0;">まだ履歴はありません。</p>';
         return;
     }
 
-    container.innerHTML = vegHistory.map(item => `
+    container.innerHTML = vegHistory.map(item => {
+        // 食材（本漬け・捨漬け）のときだけ区分を表示し、かき混ぜ・足しぬかのときは非表示にする
+        let typeBadge = '';
+        if (item.name !== 'かき混ぜ' && !item.name.startsWith('足しぬか')) {
+            typeBadge = item.isSute ? '[捨漬け]' : '[本漬け]';
+        }
+
+        // ぬか床名がある場合は後ろに「（ぬか床名）」を添える
+        let bedDisplay = item.bedName ? ` <span style="font-size: 0.8rem; color: #8c7462; font-weight: normal;">「${item.bedName}」</span>` : '';
+
+        return `
         <div class="history-item-wrapper">
             <div class="history-delete-action" onclick="promptRemoveVegHistory(${item.id})">削除</div>
             <div class="veg-history-card history-card-content">
                 <div class="veg-history-header">
                     <div class="veg-history-title">
                         <span>${item.icon}</span>
-                        <span>${item.isSute ? '[捨漬け]' : ''}${item.name}</span>
+                        <span>${typeBadge}${item.name}${bedDisplay}</span>
                     </div>
                     <div class="veg-history-right">
                         <span class="veg-history-time">${item.timeText ? timerSvgIcon + item.timeText : ''}</span>
@@ -536,7 +547,8 @@ function renderVegHistory() {
                 <div class="veg-history-memo-box" onclick="openMemoModal(${item.id})">${item.memo ? item.memo : '<span class="no-memo">タップしてメモ・感想を入力...</span>'}</div>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 
     setupHistorySwipe();
 }
@@ -825,6 +837,35 @@ document.addEventListener('DOMContentLoaded', () => {
         updateNukaDisplay(currentIndex);
     });
 
+
+    // ぬか床イラスト部分の左右スワイプ切り替え
+    const containerWrapper = document.querySelector('.container-wrapper');
+    if (containerWrapper) {
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        containerWrapper.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+
+        containerWrapper.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].clientX;
+            const diffX = touchEndX - touchStartX;
+
+            // 50px以上スワイプされたと判定した場合に切り替え
+            if (Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    // 右にスワイプ ➔ 前のぬか床へ
+                    currentIndex = (currentIndex - 1 + nukaBeds.length) % nukaBeds.length;
+                } else {
+                    // 左にスワイプ ➔ 次のぬか床へ
+                    currentIndex = (currentIndex + 1) % nukaBeds.length;
+                }
+                updateNukaDisplay(currentIndex);
+            }
+        });
+    }
+
     document.getElementById('home-btn-mix')?.addEventListener('click', () => {
         openModal('mix-confirm-modal');
     });
@@ -837,13 +878,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentBed.lastMixTime) {
             const diffMs = now - new Date(currentBed.lastMixTime);
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-            elapsedText = `（前回から ${diffHours}時間）`;
+            elapsedText = `前回から ${diffHours}時間`;
         }
 
         currentBed.lastMixTime = now;
-        addHistoryLog('👋🏼', `かき混ぜ「${currentBed.name}」${elapsedText}`);
+
+        // カレンダー用のログ追加
+        addHistoryLog('👋🏼', `「${currentBed.name}」をかき混ぜました<br>${elapsedText ? '（' + elapsedText + '）' : ''}`);
+
+        // ぬか漬け記録（履歴・メモ）用のデータ追加
+        vegHistory.unshift({
+            id: Date.now(),
+            name: 'かき混ぜ',
+            icon: '👋🏼',
+            isSute: false,
+            timeText: elapsedText,
+            dateStr: getFormattedDateTime().full,
+            memo: '',
+            bedName: currentBed.name
+        });
 
         updateHomeCareDisplay();
+        renderVegHistory();
         saveData();
         closeModal('mix-confirm-modal');
     });
@@ -860,7 +916,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const nukaG = document.getElementById('input-nuka')?.value || 100;
         const saltG = document.getElementById('input-salt')?.value || 8.0;
         const currentBedName = nukaBeds[currentIndex].name;
-        addHistoryLog('🌾', `足しぬか「${currentBedName}」<br>（ぬか: ${nukaG}g/ 塩: ${saltG}g）`);
+
+        // カレンダー用のログ追加
+        addHistoryLog('🌾', `足しぬか（ぬか: ${nukaG}g / 塩: ${saltG}g）<br>「${currentBedName}」`);
+
+        // ぬか漬け記録（履歴・メモ）用のデータ追加
+        vegHistory.unshift({
+            id: Date.now(),
+            name: `足しぬか（ぬか:${nukaG}g / 塩:${saltG}g）`,
+            icon: '🌾',
+            isSute: false,
+            timeText: '',
+            dateStr: getFormattedDateTime().full,
+            memo: '',
+            bedName: currentBedName
+        });
+
+        renderVegHistory();
         saveData();
         closeModal('care-modal');
     });
@@ -996,18 +1068,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let csvContent = "\uFEFF" + "ID,食材名,アイコン,区分(捨漬け),漬け時間,取り出し日時,メモ・感想\n";
+        // 列順: ID, 日時, アイコン, 区分, 項目, ぬか床名, メモ・感想
+        let csvContent = "\uFEFF" + "ID,取り出し日時,アイコン,区分,項目,ぬか床名,メモ・感想\n";
 
         vegHistory.forEach(item => {
             const id = item.id;
-            const name = `"${(item.name || "").replace(/"/g, '""')}"`;
-            const icon = `"${(item.icon || "").replace(/"/g, '""')}"`;
-            const isSute = item.isSute ? "捨漬け" : "本漬け";
-            const timeText = `"${(item.timeText || "").replace(/"/g, '""')}"`;
             const dateStr = `"${(item.dateStr || "").replace(/"/g, '""')}"`;
+            const icon = `"${(item.icon || "").replace(/"/g, '""')}"`;
+
+            // 区分：かき混ぜ・足しぬかの場合は空欄、食材（本漬け/捨漬け）のときのみ表示
+            let typeStr = "";
+            if (item.name !== 'かき混ぜ' && (!item.name || !item.name.startsWith('足しぬか'))) {
+                typeStr = item.isSute ? "捨漬け" : "本漬け";
+            }
+            const typeVal = `"${typeStr}"`;
+
+            const name = `"${(item.name || "").replace(/"/g, '""')}"`;
+            const bedName = `"${(item.bedName || "").replace(/"/g, '""')}"`;
             const memo = `"${(item.memo || "").replace(/"/g, '""')}"`;
 
-            csvContent += `${id},${name},${icon},${isSute},${timeText},${dateStr},${memo}\n`;
+            csvContent += `${id},${dateStr},${icon},${typeVal},${name},${bedName},${memo}\n`;
         });
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
