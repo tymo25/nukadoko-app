@@ -822,6 +822,72 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ==========================================
+    // 画面全体の左右スワイプによるタブ切り替え機能
+    // ==========================================
+    const mainContent = document.querySelector('.main-content');
+
+    if (mainContent && typeof navItems !== 'undefined' && navItems.length > 0) {
+        let tabStartX = 0;
+        let tabStartY = 0;
+        let isTabSwiping = false;
+
+        mainContent.addEventListener('touchstart', (e) => {
+            // モーダルが開いている時や、ボタン・入力欄などのタッチは除外
+            if (isAnyModalOpen() || e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea')) {
+                isTabSwiping = false;
+                return;
+            }
+            tabStartX = e.touches[0].clientX;
+            tabStartY = e.touches[0].clientY;
+            isTabSwiping = true;
+        }, { passive: true });
+
+        mainContent.addEventListener('touchmove', (e) => {
+            if (!isTabSwiping) return;
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+
+            // 指を斜めではなく、しっかりと「横方向」に動かしているか判定
+            const diffX = currentX - tabStartX;
+            const diffY = currentY - tabStartY;
+            if (Math.abs(diffY) > Math.abs(diffX)) {
+                isTabSwiping = false; // 縦スクロールの意図であればスワイプをキャンセル
+            }
+        }, { passive: true });
+
+        mainContent.addEventListener('touchend', (e) => {
+            if (!isTabSwiping) return;
+            isTabSwiping = false;
+
+            const tabEndX = e.changedTouches[0].clientX;
+            const diffX = tabEndX - tabStartX;
+
+            // 一定以上（70px以上）横にスワイプされた場合
+            if (Math.abs(diffX) > 70) {
+                // 現在アクティブなタブの番号を探す
+                let activeIndex = 0;
+                navItems.forEach((item, index) => {
+                    if (item.classList.contains('active')) {
+                        activeIndex = index;
+                    }
+                });
+
+                if (diffX > 0) {
+                    // 右にスワイプ ➔ 左のタブへ（ホーム ➔ カレンダー ➔ ぬか漬け記録...のループまたは順序）
+                    // 順番: ホーム(0) -> ぬか漬け記録(1) -> カレンダー(2)
+                    activeIndex = (activeIndex - 1 + navItems.length) % navItems.length;
+                } else {
+                    // 左にスワイプ ➔ 右のタブへ
+                    activeIndex = (activeIndex + 1) % navItems.length;
+                }
+
+                // 該当するタブのクリック処理を走らせて画面を切り替える
+                navItems[activeIndex].click();
+            }
+        });
+    }
+
     const savedTabIndex = localStorage.getItem('activeTabIndex');
     if (savedTabIndex !== null && navItems[savedTabIndex]) {
         navItems[savedTabIndex].click();
@@ -838,10 +904,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // ぬか床イラスト部分の左右スワイプ切り替え
-    // ==========================================
     // ぬか床エリア全体の指追従スワイプ切り替え
-    // ==========================================
+
     const homePage = document.getElementById('home-page');
     // ホーム画面のカード全体をスワイプ対象にする
     const targetCard = homePage ? homePage.querySelector('.card') : null;
