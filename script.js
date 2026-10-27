@@ -840,28 +840,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ぬか床イラスト部分の左右スワイプ切り替え
     const containerWrapper = document.querySelector('.container-wrapper');
-    if (containerWrapper) {
+    const illustrationBox = document.querySelector('.illustration-box');
+
+    if (containerWrapper && illustrationBox) {
         let touchStartX = 0;
-        let touchEndX = 0;
+        let currentX = 0;
+        let isSwiping = false;
 
         containerWrapper.addEventListener('touchstart', (e) => {
             touchStartX = e.touches[0].clientX;
+            isSwiping = true;
+            illustrationBox.style.transition = 'none'; // 動かしている最中はアニメーションを切り、指に完全に追従させる
+        }, { passive: true });
+
+        containerWrapper.addEventListener('touchmove', (e) => {
+            if (!isSwiping) return;
+            currentX = e.touches[0].clientX;
+            const diffX = currentX - touchStartX;
+
+            // 指の動きに合わせてイラストボックスを左右にリアルタイムで動かす
+            illustrationBox.style.transform = `translateX(${diffX}px)`;
         }, { passive: true });
 
         containerWrapper.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].clientX;
+            if (!isSwiping) return;
+            isSwiping = false;
+
+            const touchEndX = e.changedTouches[0].clientX;
             const diffX = touchEndX - touchStartX;
 
-            // 50px以上スワイプされたと判定した場合に切り替え
-            if (Math.abs(diffX) > 50) {
-                if (diffX > 0) {
-                    // 右にスワイプ ➔ 前のぬか床へ
-                    currentIndex = (currentIndex - 1 + nukaBeds.length) % nukaBeds.length;
-                } else {
-                    // 左にスワイプ ➔ 次のぬか床へ
-                    currentIndex = (currentIndex + 1) % nukaBeds.length;
-                }
-                updateNukaDisplay(currentIndex);
+            // 指を離した後の動きにスムーズなアニメーションを設定
+            illustrationBox.style.transition = 'transform 0.25s ease';
+
+            if (Math.abs(diffX) > 60) {
+                // 一定以上（60px以上）スワイプしていた場合：画面の端へシュッと飛ばす
+                const flyOutX = diffX > 0 ? 300 : -300;
+                illustrationBox.style.transform = `translateX(${flyOutX}px)`;
+
+                setTimeout(() => {
+                    // ぬか床の番号を切り替え
+                    if (diffX > 0) {
+                        currentIndex = (currentIndex - 1 + nukaBeds.length) % nukaBeds.length;
+                    } else {
+                        currentIndex = (currentIndex + 1) % nukaBeds.length;
+                    }
+                    updateNukaDisplay(currentIndex);
+
+                    // 次のぬか床のイラストを反対側の端に瞬間移動させ、スッと中央に戻す
+                    illustrationBox.style.transition = 'none';
+                    illustrationBox.style.transform = diffX > 0 ? 'translateX(-300px)' : 'translateX(300px)';
+
+                    setTimeout(() => {
+                        illustrationBox.style.transition = 'transform 0.25s ease';
+                        illustrationBox.style.transform = 'translateX(0px)';
+                    }, 20);
+                }, 200);
+            } else {
+                // スワイプが足りない場合：元の位置にスルスルと戻す
+                illustrationBox.style.transform = `translateX(0px)`;
             }
         });
     }
