@@ -822,68 +822,87 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ==========================================
-    // 画面全体の左右スワイプによるタブ切り替え機能
-    // ==========================================
-    const mainContent = document.querySelector('.main-content');
 
-    if (mainContent && typeof navItems !== 'undefined' && navItems.length > 0) {
+    // 画面全体の左右スワイプによるタブ切り替え機能
+    const footerNav = document.querySelector('.footer-nav');
+    const pagesContainer = document.querySelector('.main-content');
+
+    if (footerNav && pagesContainer && typeof navItems !== 'undefined' && navItems.length > 0) {
         let tabStartX = 0;
-        let tabStartY = 0;
+        let currentX = 0;
         let isTabSwiping = false;
 
-        mainContent.addEventListener('touchstart', (e) => {
-            // モーダルが開いている時や、ボタン・入力欄などのタッチは除外
-            if (isAnyModalOpen() || e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea')) {
-                isTabSwiping = false;
-                return;
-            }
+        // 下部ナビゲーションバー、または履歴リスト以外のメイン余白をスワイプの起点にする
+        footerNav.addEventListener('touchstart', (e) => {
+            if (isAnyModalOpen()) return;
             tabStartX = e.touches[0].clientX;
-            tabStartY = e.touches[0].clientY;
             isTabSwiping = true;
+
+            // 現在アクティブなページにアニメーションなしの指追従を設定
+            const activePage = document.querySelector('.page-content:not(.hidden)');
+            if (activePage) activePage.style.transition = 'none';
         }, { passive: true });
 
-        mainContent.addEventListener('touchmove', (e) => {
+        footerNav.addEventListener('touchmove', (e) => {
             if (!isTabSwiping) return;
-            const currentX = e.touches[0].clientX;
-            const currentY = e.touches[0].clientY;
-
-            // 指を斜めではなく、しっかりと「横方向」に動かしているか判定
+            currentX = e.touches[0].clientX;
             const diffX = currentX - tabStartX;
-            const diffY = currentY - tabStartY;
-            if (Math.abs(diffY) > Math.abs(diffX)) {
-                isTabSwiping = false; // 縦スクロールの意図であればスワイプをキャンセル
+
+            const activePage = document.querySelector('.page-content:not(.hidden)');
+            if (activePage) {
+                activePage.style.transform = `translateX(${diffX}px)`;
             }
         }, { passive: true });
 
-        mainContent.addEventListener('touchend', (e) => {
+        footerNav.addEventListener('touchend', (e) => {
             if (!isTabSwiping) return;
             isTabSwiping = false;
 
             const tabEndX = e.changedTouches[0].clientX;
             const diffX = tabEndX - tabStartX;
 
-            // 一定以上（70px以上）横にスワイプされた場合
+            const activePage = document.querySelector('.page-content:not(.hidden)');
+            if (!activePage) return;
+
+            activePage.style.transition = 'transform 0.25s ease';
+
+            // 70px以上スワイプされたらタブを切り替える
             if (Math.abs(diffX) > 70) {
-                // 現在アクティブなタブの番号を探す
-                let activeIndex = 0;
-                navItems.forEach((item, index) => {
-                    if (item.classList.contains('active')) {
-                        activeIndex = index;
+                const flyOutX = diffX > 0 ? 350 : -350;
+                activePage.style.transform = `translateX(${flyOutX}px)`;
+
+                setTimeout(() => {
+                    let activeIndex = 0;
+                    navItems.forEach((item, index) => {
+                        if (item.classList.contains('active')) {
+                            activeIndex = index;
+                        }
+                    });
+
+                    if (diffX > 0) {
+                        activeIndex = (activeIndex - 1 + navItems.length) % navItems.length;
+                    } else {
+                        activeIndex = (activeIndex + 1) % navItems.length;
                     }
-                });
 
-                if (diffX > 0) {
-                    // 右にスワイプ ➔ 左のタブへ（ホーム ➔ カレンダー ➔ ぬか漬け記録...のループまたは順序）
-                    // 順番: ホーム(0) -> ぬか漬け記録(1) -> カレンダー(2)
-                    activeIndex = (activeIndex - 1 + navItems.length) % navItems.length;
-                } else {
-                    // 左にスワイプ ➔ 右のタブへ
-                    activeIndex = (activeIndex + 1) % navItems.length;
-                }
+                    // タブを切り替える
+                    navItems[activeIndex].click();
 
-                // 該当するタブのクリック処理を走らせて画面を切り替える
-                navItems[activeIndex].click();
+                    // 新しいページの演出（反対側からスッと登場させる）
+                    const newActivePage = document.querySelector('.page-content:not(.hidden)');
+                    if (newActivePage) {
+                        newActivePage.style.transition = 'none';
+                        newActivePage.style.transform = diffX > 0 ? 'translateX(-350px)' : 'translateX(350px)';
+
+                        setTimeout(() => {
+                            newActivePage.style.transition = 'transform 0.25s ease';
+                            newActivePage.style.transform = 'translateX(0px)';
+                        }, 20);
+                    }
+                }, 200);
+            } else {
+                // スワイプが足りない場合は元の位置に戻る
+                activePage.style.transform = `translateX(0px)`;
             }
         });
     }
