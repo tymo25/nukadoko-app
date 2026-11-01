@@ -820,97 +820,22 @@ document.addEventListener('DOMContentLoaded', () => {
             navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
 
-            pages.forEach(page => page?.classList.add('hidden'));
-            if (pages[index]) pages[index].classList.remove('hidden');
+            pages.forEach(page => {
+                if (page) {
+                    page.classList.add('hidden');
+                    // スワイプ等でずれた位置を綺麗にリセットする
+                    page.style.transform = 'none';
+                }
+            });
+
+            if (pages[index]) {
+                pages[index].classList.remove('hidden');
+                pages[index].style.transform = 'none';
+            }
 
             localStorage.setItem('activeTabIndex', index);
         });
     });
-
-
-    // 画面全体の左右スワイプによるタブ切り替え機能
-    const footerNav = document.querySelector('.footer-nav');
-    const pagesContainer = document.querySelector('.main-content');
-
-    if (footerNav && pagesContainer && typeof navItems !== 'undefined' && navItems.length > 0) {
-        let tabStartX = 0;
-        let currentX = 0;
-        let isTabSwiping = false;
-
-        // 下部ナビゲーションバー、または履歴リスト以外のメイン余白をスワイプの起点にする
-        footerNav.addEventListener('touchstart', (e) => {
-            if (isAnyModalOpen()) return;
-            tabStartX = e.touches[0].clientX;
-            isTabSwiping = true;
-
-            // 現在アクティブなページにアニメーションなしの指追従を設定
-            const activePage = document.querySelector('.page-content:not(.hidden)');
-            if (activePage) activePage.style.transition = 'none';
-        }, { passive: true });
-
-        footerNav.addEventListener('touchmove', (e) => {
-            if (!isTabSwiping) return;
-            currentX = e.touches[0].clientX;
-            const diffX = currentX - tabStartX;
-
-            const activePage = document.querySelector('.page-content:not(.hidden)');
-            if (activePage) {
-                activePage.style.transform = `translateX(${diffX}px)`;
-            }
-        }, { passive: true });
-
-        footerNav.addEventListener('touchend', (e) => {
-            if (!isTabSwiping) return;
-            isTabSwiping = false;
-
-            const tabEndX = e.changedTouches[0].clientX;
-            const diffX = tabEndX - tabStartX;
-
-            const activePage = document.querySelector('.page-content:not(.hidden)');
-            if (!activePage) return;
-
-            activePage.style.transition = 'transform 0.25s ease';
-
-            // 70px以上スワイプされたらタブを切り替える
-            if (Math.abs(diffX) > 70) {
-                const flyOutX = diffX > 0 ? 350 : -350;
-                activePage.style.transform = `translateX(${flyOutX}px)`;
-
-                setTimeout(() => {
-                    let activeIndex = 0;
-                    navItems.forEach((item, index) => {
-                        if (item.classList.contains('active')) {
-                            activeIndex = index;
-                        }
-                    });
-
-                    if (diffX > 0) {
-                        activeIndex = (activeIndex - 1 + navItems.length) % navItems.length;
-                    } else {
-                        activeIndex = (activeIndex + 1) % navItems.length;
-                    }
-
-                    // タブを切り替える
-                    navItems[activeIndex].click();
-
-                    // 新しいページの演出（反対側からスッと登場させる）
-                    const newActivePage = document.querySelector('.page-content:not(.hidden)');
-                    if (newActivePage) {
-                        newActivePage.style.transition = 'none';
-                        newActivePage.style.transform = diffX > 0 ? 'translateX(-350px)' : 'translateX(350px)';
-
-                        setTimeout(() => {
-                            newActivePage.style.transition = 'transform 0.25s ease';
-                            newActivePage.style.transform = 'translateX(0px)';
-                        }, 20);
-                    }
-                }, 200);
-            } else {
-                // スワイプが足りない場合は元の位置に戻る
-                activePage.style.transform = `translateX(0px)`;
-            }
-        });
-    }
 
     const savedTabIndex = localStorage.getItem('activeTabIndex');
     if (savedTabIndex !== null && navItems[savedTabIndex]) {
@@ -929,7 +854,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ぬか床エリア全体の指追従スワイプ切り替え
-
     const homePage = document.getElementById('home-page');
     // ホーム画面のカード全体をスワイプ対象にする
     const targetCard = homePage ? homePage.querySelector('.card') : null;
