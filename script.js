@@ -525,7 +525,7 @@ function renderVegHistory() {
         // 食材（本漬け・捨漬け）のときだけ区分を表示し、かき混ぜ・足しぬかのときは非表示にする
         let typeBadge = '';
         if (item.name !== 'かき混ぜ' && !item.name.startsWith('足しぬか')) {
-            typeBadge = item.isSute ? '[捨漬け]' : '[本漬け]';
+            typeBadge = item.isSute ? '[捨漬け]' : '';
         }
 
         // ぬか床名がある場合は後ろに「（ぬか床名）」を添える
@@ -711,18 +711,23 @@ function renderDayHistory(dateStr) {
         return;
     }
 
-    container.innerHTML = logs.map(item => `
+    container.innerHTML = logs.map(item => {
+        // 履歴テキスト内の「ぬか床名」部分にCSSクラスを付与
+        const formattedText = item.text.replace(/「(.*?)」/g, '<span class="history-bed-name">「$1」</span>');
+
+        return `
        <div class="history-item-wrapper">
             <div class="history-delete-action" onclick="promptRemoveActivityHistory(${item.id})">削除</div>
             <div class="history-item history-card-content">
                 <span class="history-icon">${item.icon}</span>
                 <div class="history-content">
-                    <div class="history-text">${item.text}</div>
+                    <div class="history-text">${formattedText}</div>
                     <div class="history-date">${item.fullDate}</div>
                 </div>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 
     setupHistorySwipe();
 }
@@ -1010,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBed.lastMixTime = now;
 
         // カレンダー用のログ追加
-        addHistoryLog('👋🏼', `「${currentBed.name}」をかき混ぜました<br>${elapsedText ? '（' + elapsedText + '）' : ''}`);
+        addHistoryLog('👋🏼', `かき混ぜ「${currentBed.name}」<br>${elapsedText ? '（' + elapsedText + '）' : ''}`);
 
         // ぬか漬け記録（履歴・メモ）用のデータ追加
         vegHistory.unshift({
