@@ -57,7 +57,7 @@ body.modal-open {
 }
 
 .header {
-    padding: 16px 16px 8px;
+    padding: 0px 16px 8px;
     text-align: center;
     background-color: #fdfbf7;
 }
@@ -1081,6 +1081,7 @@ body.modal-open {
     font-weight: 500;
     transition: transform 0.2s ease;
     z-index: 1000;
+    overflow: hidden;
 }
 
 .pull-spinner {
